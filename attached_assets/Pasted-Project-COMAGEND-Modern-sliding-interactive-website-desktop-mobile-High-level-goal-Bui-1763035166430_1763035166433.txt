@@ -1,0 +1,136 @@
+Project: COMAGEND — Modern, sliding, interactive website (desktop + mobile) 
+
+High-level goal:
+Build a modern, African-style NGO website that is visually warm and community-centered, with smooth sliding page transitions, rich micro-interactions, and pixel-perfect responsiveness. Prioritise fast load times for low-bandwidth regions and WCAG AA accessibility. The site must convert: donations, volunteers, and newsletter subscribers.
+
+Primary tech recommendations:
+- Frontend: Next.js (React) or Nuxt (Vue) — Next.js preferred.
+- Animation & interactions: Framer Motion (page transitions, component animation) + GSAP (advanced timeline animation) where needed.
+- Sliders / carousels: Swiper.js (mobile-first, performant).
+- Lottie for lightweight animated icons/micro-interactions.
+- CSS: Tailwind CSS (utility-first) or CSS Modules; use prefers-reduced-motion support.
+- CMS: Headless CMS (Strapi or Sanity) or Webflow CMS if non-dev preferred.
+- Hosting: Vercel or Netlify (Next.js), CDN for assets.
+- Images: Serve WebP/AVIF via CDN, responsive srcset.
+- Payment: Stripe + Paystack + Flutterwave (region-specific) via secure server-side endpoints.
+- Optional: SSG for public pages + ISR (incremental static regeneration) for dynamic content.
+
+Design system / UI-kit:
+- Colors: Earth brown #5A381F, Sun yellow #F4B400, Leaf green #3A7A2A, Sky blue #1D6BD8, Warm orange #E66024, Neutral #F9F6F1.
+- Typography: Poppins (headings) + Lato/Open Sans (body).
+- Spacing tokens (xs, sm, md, lg), radius 12–20px for cards, consistent shadows.
+- Iconography: custom African motif icons + Feather for system icons.
+- Lottie files for subtle movement (wave, heart beat, rising sun).
+
+UX / Interaction rules (must follow strictly):
+1. **Page transitions**: smooth left/right sliding for main nav using Framer Motion layout transitions. Duration 360–450ms easing cubic-bezier(0.22, 1, 0.36, 1). Respect `prefers-reduced-motion`.
+2. **Hero carousel**: full-bleed Swiper with autoplay off by default, manual swipe & nav arrows, lazy load slides, slide change triggers a subtle parallax of foreground image and heading (Framer Motion).
+3. **Program slider**: horizontal card slider with 3D tilt on hover (small perspective) and micro animation of CTA button on hover (scale + gradient sweep).
+4. **Impact counters**: on-scroll animated counters with number easing and thousand separators; only animate once when scrolled into view.
+5. **Donate CTA**: persistent floating Donate button in bottom-right on mobile and sticky header Donate on desktop. Hover: micro bounce + subtle shadow. Clicking opens accessible modal with full donate flow.
+6. **Micro-interactions**:
+   - Buttons: 2px offset press animation + ripple on click (small) or Lottie micro-animation for primary CTA.
+   - Form fields: inline validation with animated checkmark on success.
+   - Image cards: progressive reveal (mask slide + fade) on scroll.
+   - Testimonials: card flip or slide with soft 3D rotation when focused.
+7. **Staff profiles**: on hover show social icons overlay with fade + slide up; mobile tap toggles overlay.
+8. **Blog listing**: masonry/grid with hover tilt and read-time microbadge; reading progress indicator for article pages (thin progress bar at top that fills as user scrolls).
+9. **Transparency & Reports**: download buttons animate with a file-icon tick on successful download.
+10. **Accessibility interactions**: focus-visible outlines for keyboard nav; all animations reduce/stop if `prefers-reduced-motion` enabled; adequate color contrast; all interactive elements reachable by keyboard.
+
+Component list + interactions (detailed):
+- Header
+  - Sticky header with minimal height; on scroll down compress (height reduce) and slide in/out animation.
+  - Donate button prominent (color contrast), keyboard focus ring.
+- Hero (full screen)
+  - Sliding hero carousel (Swiper) with parallax text animation (Framer Motion).
+  - CTA primary (“Donate Now”) with Lottie pulse and secondary CTA for volunteer.
+- Stats strip
+  - Horizontal sliding ticker on mobile; each stat animates on scroll.
+- Programs section
+  - Horizontal sliding cards (desktop: multi-card slider; mobile: single card swiper).
+  - Card hover tilt + CTA micro animation.
+- Stories / Impact slider
+  - Full-width slider; each slide reveals details via sliding panels; include small audio play button for short narrated testimonial (optional).
+- How You Can Help (CTA cards)
+  - Cards flip or slide on hover; clear CTA.
+- Testimonials
+  - Carousel with autoplay paused on hover; headshots reveal quote with fade/slide.
+- Staff grid
+  - Filterable by role/region; modal profile view with contact controls.
+- Blog
+  - List + article detail with reading progress, share toolbar (WhatsApp/FB/Twitter), comments (disqus or headless CMS comments).
+- Donate modal & flow
+  - Modal slide-up animation, accessible (trap focus).
+  - Stepper UX: Choose amount → donor details → payment → confirmation.
+  - Microcopy for security & tax receipt; show progress bar for campaign goal that animates to current value.
+- Footer
+  - Animated wave or pattern background (subtle Lottie) and quick links.
+
+Data model / CMS structure:
+- Collections: Programs, Stories, BlogPosts, Staff, Testimonials, Reports, Events, Settings (contact, social links).
+- Each item: title, slug, hero image (alt text), gallery, body (rich text), tags, region, publishDate, meta (OG).
+- Translations: support keys for English + 1–2 local languages via CMS i18n.
+
+Donation technical & UX specifics:
+- Save card via Stripe Elements (tokenized), never store raw card data.
+- Payment serverside endpoints validate and create webhook for successful payments.
+- Support one-time & recurring with Stripe Billing; region-specific for Paystack/Flutterwave.
+- Generate downloadable PDF receipt via backend (server-rendered or HTML->PDF) and email immediately.
+- Fallback: If payment gateway blocked, show manual bank transfer instructions with prefilled reference.
+
+Performance & progressive enhancement:
+- Critical CSS inlined for hero + above-the-fold.
+- Image CDN + responsive srcset + AVIF/WebP fallbacks.
+- Lazy-load below-the-fold images using `loading="lazy"`.
+- Use skeleton loaders for sliders and data-loaded components.
+- Aim LCP < 2.5s on 3G simulated; Time to interactive under 3.5s.
+- Audit and reduce unused JS; code-splitting dynamic imports for sliders, Framer Motion heavy parts.
+
+Accessibility & localization:
+- WCAG AA color contrast; aria labels on all interactive components.
+- Keyboard accessible sliders (left/right arrows), focus management on modals and route transitions.
+- `lang` attribute & hreflang if multi-region.
+- `prefers-reduced-motion` honored.
+- All images must include descriptive alt text from CMS metadata.
+
+SEO & metadata:
+- SSR/SSG pages with structured data (Organization, Charity, Donation schema).
+- Open Graph and Twitter Card meta for share previews; include hero image.
+- Sitemap.xml + robots.txt + canonical tags.
+- Blog posts include author & publish date schema.
+
+Testing & QA:
+- Cross-browser (Chrome, Safari, Edge, Firefox) and devices (mobile mid-range).
+- Accessibility audit (axe-core or pa11y).
+- Performance audit (Lighthouse) with targets: >90 mobile score for CLS, PWA not required but use service worker for offline caching of key pages.
+- Payment testing with sandbox credentials + webhook verification.
+
+Analytics & tracking:
+- GA4 + event tracking for: donate-click, donate-complete, volunteer-signup, newsletter-subscribe.
+- Pixel (Facebook/Meta) optionally for campaign tracking.
+- Consent banner for cookies and analytics (CMP).
+
+Deliverables:
+1. Production-ready Next.js project with components, pages and CMS integration.
+2. Figma files or Framer project for desktop + mobile screens and interactive prototypes (showing slide transitions and microinteractions).
+3. Accessible HTML content for CMS (copy blocks).
+4. Admin guide: how to add programs, publish blog posts, upload reports, and view donations.
+5. Acceptance test checklist & QA report.
+
+Acceptance criteria (must be met before sign-off):
+- All page transitions and sliders work smoothly, and `prefers-reduced-motion` is respected.
+- Donate flow works end-to-end with at least two payment gateways in sandbox and receipts are generated.
+- Mobile and desktop responsive with no visual overlap or overflow; hero slides properly on all sizes.
+- Lighthouse mobile score ≥ 80, desktop ≥ 95, CLS < 0.1.
+- WCAG AA compliance report completed and passed for all public pages.
+- Admin can add/edit Programs, Stories, Staff, Blog posts and Reports via CMS.
+- SEO and social meta present on key pages.
+- Unit/integration tests for critical flows (auth, donate).
+
+Notes for dev/designer:
+- Keep animations subtle and meaningful — every motion should have a purpose (reinforce hierarchy or provide feedback).
+- Provide “reduced motion” toggle in settings for users.
+- For low-bandwidth users, provide a “low-data” theme (no autoplay animations, smaller images).
+- Use local imagery and authentic visual language; avoid generic stock aesthetics.
+
