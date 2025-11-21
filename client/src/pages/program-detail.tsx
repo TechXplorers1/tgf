@@ -1,14 +1,43 @@
 import { useState } from "react";
-import { useQuery } from "@tanstack/react-query";
-import type { Program, InsertDonation } from "@shared/schema";
+import { useQuery, useMutation } from "@tanstack/react-query";
+import type {
+  Program,
+  InsertDonation,
+  InsertContactMessage,
+} from "@shared/schema";
+import { insertContactMessageSchema } from "@shared/schema";
+
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { motion } from "framer-motion";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, CheckCircle } from "lucide-react";
 import { Link } from "wouter";
 import { DonateSection } from "@/components/DonateSection";
+
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+} from "@/components/ui/dialog";
+
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { apiRequest } from "@/lib/queryClient";
+import { useToast } from "@/hooks/use-toast";
 
 import programImage1 from "@assets/generated_images/Women_economic_empowerment_program_d8422519.png";
 import programImage2 from "@assets/generated_images/Youth_development_program_ecd0f2bd.png";
@@ -20,14 +49,13 @@ const programImages: Record<string, string> = {
   "Community Health Initiatives": programImage3,
 };
 
-// Map title → donation program enum
 const titleToDonationProgram: Record<string, InsertDonation["program"]> = {
   "Women's Economic Empowerment": "general",
   "Youth Development & Education": "education",
   "Community Health Initiatives": "healthcare",
 };
 
-// Extra content per program (long description, objectives, impact, stats)
+// Extra content per program
 type ProgramExtra = {
   longDescription: string;
   objectives: string[];
@@ -37,16 +65,16 @@ type ProgramExtra = {
 
 const defaultExtra: ProgramExtra = {
   longDescription:
-    "This program is designed to create sustainable, community-led change through training, advocacy, and direct support. We work closely with local leaders and beneficiaries to ensure every activity responds to real needs on the ground.",
+    "This program is designed to create sustainable, community-led change through training, advocacy, and direct support.",
   objectives: [
-    "Provide targeted support to the most vulnerable community members",
-    "Build local capacity through training and mentorship",
-    "Create sustainable systems that continue beyond project funding",
+    "Provide targeted support to vulnerable communities",
+    "Build local capacity",
+    "Create sustainable systems beyond project funding",
   ],
   impactAreas: [
-    "Community awareness and mobilization",
-    "Partnerships with local organizations",
-    "Long-term resilience and self-reliance",
+    "Community awareness",
+    "Partnerships",
+    "Long-term resilience",
   ],
   stats: [
     { label: "People Reached", value: "1,500+" },
@@ -55,20 +83,17 @@ const defaultExtra: ProgramExtra = {
   ],
 };
 
+// Program-specific content
 const programExtraByTitle: Record<string, ProgramExtra> = {
   "Women's Economic Empowerment": {
     longDescription:
-      "The Women’s Economic Empowerment Program supports women to start and grow small businesses, access savings and credit, and build the confidence to participate in decision-making at home and in the community. We combine practical business skills with rights awareness and peer support groups.",
+      "Empowering women with business training, microfinance, and leadership skills.",
     objectives: [
-      "Train women in basic business, marketing, and financial management",
-      "Increase access to savings groups and small loans",
-      "Strengthen women’s leadership and voice in household and community decisions",
+      "Train women in business and financial skills",
+      "Increase access to microloans and savings groups",
+      "Strengthen women's leadership",
     ],
-    impactAreas: [
-      "Income generation and livelihoods",
-      "Financial inclusion and savings culture",
-      "Women’s rights and leadership",
-    ],
+    impactAreas: ["Livelihoods", "Financial Inclusion", "Leadership"],
     stats: [
       { label: "Women Trained", value: "800+" },
       { label: "Businesses Started", value: "250+" },
@@ -77,17 +102,13 @@ const programExtraByTitle: Record<string, ProgramExtra> = {
   },
   "Youth Development & Education": {
     longDescription:
-      "Our Youth Development & Education Program invests in the next generation through tutoring, life-skills training, and mentorship. We help young people stay in school, discover their talents, and transition into decent work opportunities.",
+      "Supporting education, career guidance, and youth empowerment initiatives.",
     objectives: [
-      "Improve learning outcomes and school retention",
-      "Equip youth with life skills and digital literacy",
-      "Connect young people to mentorship, internships, and job pathways",
+      "Improve school retention",
+      "Teach leadership & digital skills",
+      "Connect youth to career paths",
     ],
-    impactAreas: [
-      "After-school tutoring and remedial classes",
-      "Digital skills and career guidance",
-      "Youth leadership and peer-to-peer mentoring",
-    ],
+    impactAreas: ["Education", "Skills", "Mentoring"],
     stats: [
       { label: "Students Reached", value: "1,200+" },
       { label: "Scholarships", value: "95" },
@@ -96,21 +117,17 @@ const programExtraByTitle: Record<string, ProgramExtra> = {
   },
   "Community Health Initiatives": {
     longDescription:
-      "The Community Health Initiatives Program focuses on preventive health, maternal and child care, and access to basic services. We train community health volunteers, run outreach clinics, and link families to local health facilities.",
+      "Providing health education and access to essential community healthcare.",
     objectives: [
-      "Increase awareness of key health and hygiene practices",
-      "Support mothers and children with essential health services",
-      "Strengthen community linkages with health facilities and providers",
+      "Increase healthcare awareness",
+      "Support maternal and child health",
+      "Strengthen healthcare systems",
     ],
-    impactAreas: [
-      "Health education and awareness campaigns",
-      "Maternal and child health support",
-      "Water, sanitation, and hygiene (WASH)",
-    ],
+    impactAreas: ["Health Education", "Care Support", "Hygiene"],
     stats: [
       { label: "People Reached", value: "2,000+" },
       { label: "Health Sessions", value: "150+" },
-      { label: "Community Volunteers", value: "60+" },
+      { label: "Volunteers", value: "60+" },
     ],
   },
 };
@@ -120,7 +137,8 @@ type ProgramDetailProps = {
 };
 
 export default function ProgramDetail({ id }: ProgramDetailProps) {
-  // Reuse /api/programs list and find the one we need
+  const { toast } = useToast();
+
   const { data: programs, isLoading, error } = useQuery<Program[]>({
     queryKey: ["/api/programs"],
   });
@@ -138,42 +156,65 @@ export default function ProgramDetail({ id }: ProgramDetailProps) {
   const extra: ProgramExtra =
     (program && programExtraByTitle[program.title]) || defaultExtra;
 
-  const [showDonationForm, setShowDonationForm] = useState(false);
+  // Popup states
+  const [isDonationDialogOpen, setIsDonationDialogOpen] = useState(false);
+  const [isVolunteerDialogOpen, setIsVolunteerDialogOpen] = useState(false);
+  const [volunteerSuccess, setVolunteerSuccess] = useState(false);
 
-  // Scroll handler – works every time you click the button
-  const handleSupportClick = () => {
-    if (!showDonationForm) {
-      setShowDonationForm(true);
-    }
-    setTimeout(() => {
-      document
-        .getElementById("donate")
-        ?.scrollIntoView({ behavior: "smooth", block: "start" });
-    }, 100);
-  };
+  // Volunteer form setup
+  const volunteerForm = useForm<InsertContactMessage>({
+    resolver: zodResolver(insertContactMessageSchema),
+    defaultValues: {
+      name: "",
+      email: "",
+      subject: `I’d like to volunteer for ${program?.title || "COMAGEND"}`,
+      message: "",
+    },
+  });
+
+  const volunteerMutation = useMutation({
+    mutationFn: async (data: InsertContactMessage) => {
+      return await apiRequest("POST", "/api/contact", data);
+    },
+    onSuccess: () => {
+      setVolunteerSuccess(true);
+      toast({ title: "Thank you for volunteering!", description: "We'll contact you soon." });
+      volunteerForm.reset({
+        name: "",
+        email: "",
+        subject: `I’d like to volunteer for ${program?.title || "COMAGEND"}`,
+        message: "",
+      });
+      setTimeout(() => setVolunteerSuccess(false), 3000);
+    },
+  });
+
+  const handleVolunteerSubmit = (data: InsertContactMessage) =>
+    volunteerMutation.mutate(data);
 
   return (
     <div className="min-h-screen bg-background overflow-x-hidden">
       <Header />
 
-      <main className="pt-24 pb-16">
+      <main className="pt-32 pb-16"> {/* Increased from pt-24 to prevent header overlap */}
         <div className="container mx-auto px-4">
-          {/* Back link */}
+
+          {/* Back Button (Now goes to Home) */}
           <div className="mb-6">
-            <Link href="/#programs">
+            <Link href="/">
               <Button
                 variant="ghost"
                 size="sm"
                 className="inline-flex items-center gap-2"
               >
                 <ArrowLeft className="w-4 h-4" />
-                Back to Programs
+                Back to Home
               </Button>
             </Link>
           </div>
 
+          {/* Loading/Error UI */}
           {isLoading ? (
-            // ⏳ Loading skeleton
             <div className="grid md:grid-cols-2 gap-10">
               <Skeleton className="w-full h-72" />
               <div className="space-y-4">
@@ -184,69 +225,53 @@ export default function ProgramDetail({ id }: ProgramDetailProps) {
               </div>
             </div>
           ) : error || !program ? (
-            // ❌ Error or not found
             <div className="text-center py-20">
-              <p className="font-sans text-muted-foreground mb-4">
-                Unable to load this program.
-              </p>
-              <Link href="/#programs">
-                <Button>Back to Programs</Button>
+              <p className="text-muted-foreground">Unable to load this program.</p>
+              <Link href="/">
+                <Button>Back to Home</Button>
               </Link>
             </div>
           ) : (
             <>
-              {/* ✅ Program header content */}
+              {/* Program Header */}
               <div className="grid md:grid-cols-2 gap-10 items-start">
-                {/* Image */}
                 <motion.div
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.4 }}
                 >
-                  <div className="overflow-hidden rounded-xl shadow-md">
-                    <img
-                      src={image}
-                      alt={program.title}
-                      className="w-full h-72 md:h-96 object-cover"
-                    />
-                  </div>
+                  <img
+                    src={image}
+                    alt={program.title}
+                    className="w-full h-72 md:h-96 object-cover rounded-xl shadow"
+                  />
                 </motion.div>
 
-                {/* Text content */}
                 <motion.div
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.4, delay: 0.1 }}
                 >
-                  <span className="inline-flex px-3 py-1 rounded-full bg-primary/10 text-primary text-xs font-semibold mb-3">
+                  <span className="px-3 py-1 rounded-full bg-primary/10 text-primary text-xs font-semibold mb-3">
                     {program.category}
                   </span>
 
-                  <h1 className="font-heading font-bold text-3xl md:text-4xl mb-4">
+                  <h1 className="font-heading text-3xl md:text-4xl font-bold mb-4">
                     {program.title}
                   </h1>
 
-                  <p className="font-sans text-muted-foreground text-lg mb-4">
-                    {program.description}
-                  </p>
+                  <p className="text-muted-foreground mb-4 text-lg">{program.description}</p>
 
-                  {/* Long description */}
-                  <p className="font-sans text-foreground/90 mb-6">
-                    {extra.longDescription}
-                  </p>
+                  <p className="text-foreground/90 mb-6">{extra.longDescription}</p>
 
-                  <div className="flex flex-wrap gap-3 mt-4">
-                    <Button
-                      size="lg"
-                      className="font-sans font-medium"
-                      onClick={handleSupportClick}
-                    >
+                  <div className="flex gap-3">
+                    <Button size="lg" onClick={() => setIsDonationDialogOpen(true)}>
                       Support This Program
                     </Button>
                     <Button
                       size="lg"
                       variant="outline"
-                      className="font-sans font-medium"
+                      onClick={() => setIsVolunteerDialogOpen(true)}
                     >
                       Volunteer With Us
                     </Button>
@@ -254,63 +279,117 @@ export default function ProgramDetail({ id }: ProgramDetailProps) {
                 </motion.div>
               </div>
 
-              {/* Quick stats */}
+              {/* Stats Section */}
               <section className="mt-12">
-                <h2 className="font-heading font-semibold text-2xl mb-4">
-                  Program Snapshot
-                </h2>
+                <h2 className="font-heading text-2xl mb-4">Program Snapshot</h2>
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                   {extra.stats.map((stat) => (
                     <div
                       key={stat.label}
-                      className="rounded-xl border bg-card p-4 shadow-sm"
+                      className="rounded-xl border p-4 shadow-sm bg-card"
                     >
-                      <p className="text-sm font-sans text-muted-foreground mb-1">
-                        {stat.label}
-                      </p>
-                      <p className="text-2xl font-heading font-bold">
-                        {stat.value}
-                      </p>
+                      <p className="text-sm text-muted-foreground">{stat.label}</p>
+                      <p className="text-2xl font-heading">{stat.value}</p>
                     </div>
                   ))}
                 </div>
               </section>
 
-              {/* Objectives & impact areas */}
+              {/* Objectives & Impact Areas */}
               <section className="mt-12 grid md:grid-cols-2 gap-8">
                 <div>
-                  <h3 className="font-heading font-semibold text-xl mb-3">
-                    Key Objectives
-                  </h3>
-                  <ul className="list-disc list-inside space-y-2 font-sans text-foreground/90">
+                  <h3 className="font-heading text-xl mb-3">Key Objectives</h3>
+                  <ul className="list-disc pl-5 space-y-2">
                     {extra.objectives.map((item) => (
                       <li key={item}>{item}</li>
                     ))}
                   </ul>
                 </div>
-
                 <div>
-                  <h3 className="font-heading font-semibold text-xl mb-3">
-                    Impact Areas
-                  </h3>
-                  <ul className="list-disc list-inside space-y-2 font-sans text-foreground/90">
+                  <h3 className="font-heading text-xl mb-3">Impact Areas</h3>
+                  <ul className="list-disc pl-5 space-y-2">
                     {extra.impactAreas.map((item) => (
                       <li key={item}>{item}</li>
                     ))}
                   </ul>
                 </div>
               </section>
-
-              {/* Donation form appears only when button clicked */}
-              {showDonationForm && (
-                <div className="mt-16">
-                  <DonateSection initialProgram={donationProgram} />
-                </div>
-              )}
             </>
           )}
         </div>
       </main>
+
+      {/* Donation Popup */}
+      <Dialog open={isDonationDialogOpen} onOpenChange={setIsDonationDialogOpen}>
+        <DialogContent className="w-[95vw] max-w-3xl p-0">
+          <DonateSection initialProgram={donationProgram} />
+        </DialogContent>
+      </Dialog>
+
+      {/* Volunteer Popup */}
+      <Dialog open={isVolunteerDialogOpen} onOpenChange={setIsVolunteerDialogOpen}>
+        <DialogContent className="w-[95vw] max-w-lg max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Volunteer With Us</DialogTitle>
+            <DialogDescription>
+              Share your details and we’ll connect with you.
+            </DialogDescription>
+          </DialogHeader>
+
+          <Form {...volunteerForm}>
+            <form
+              onSubmit={volunteerForm.handleSubmit(handleVolunteerSubmit)}
+              className="space-y-6"
+            >
+              <FormField
+                control={volunteerForm.control}
+                name="name"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Name</FormLabel>
+                    <FormControl>
+                      <Input {...field} placeholder="Your name" />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={volunteerForm.control}
+                name="email"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Email</FormLabel>
+                    <FormControl>
+                      <Input {...field} type="email" placeholder="you@example.com" />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={volunteerForm.control}
+                name="message"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Message</FormLabel>
+                    <FormControl>
+                      <Textarea rows={4} {...field} placeholder="How would you like to help?" />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <Button type="submit" className="w-full">
+                Submit
+              </Button>
+            </form>
+          </Form>
+        </DialogContent>
+      </Dialog>
 
       <Footer />
     </div>

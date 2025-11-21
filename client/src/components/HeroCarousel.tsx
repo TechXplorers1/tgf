@@ -7,11 +7,13 @@ import { Button } from "@/components/ui/button";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import type { Program } from "@shared/schema";
+import { Link } from "wouter"; // 👈 added
 
-// import "swiper/css";
-// import "swiper/css/navigation";
-// import "swiper/css/pagination";
-// import "swiper/css/effect-fade";
+// ✅ Swiper core styles (needed!)
+import "swiper/css";
+import "swiper/css/navigation";
+import "swiper/css/pagination";
+import "swiper/css/effect-fade";
 
 import heroImage1 from "@assets/generated_images/Hero_community_empowerment_scene_3c5019a0.png";
 import heroImage2 from "@assets/generated_images/Gender_equality_workshop_hero_9359228b.png";
@@ -31,21 +33,21 @@ const fallbackSlides = [
     subtitle:
       "Building a future of gender equality and sustainable development across Africa",
     image: heroImage1,
-    programPath: "#programs",
+    programPath: "/programs", // 👈 go to programs page
   },
   {
     title: "Gender Equality for All",
     subtitle:
       "Creating opportunities and advocating for women's rights in every community",
     image: heroImage2,
-    programPath: "#programs",
+    programPath: "/programs",
   },
   {
     title: "Youth Development",
     subtitle:
       "Investing in the next generation through education and skills training",
     image: heroImage3,
-    programPath: "#programs",
+    programPath: "/programs",
   },
 ];
 
@@ -62,31 +64,39 @@ export default function HeroCarousel() {
   // build hero slides from programs if available
   const programSlides =
     programs && programs.length > 0
-      ? // use first 3 programs (or change logic as you like)
-        programs.slice(0, 3).map((program) => ({
-          title: program.title, // same title as ProgramDetail
-          subtitle: program.description, // use DB description under the heading
-          image:
-            programHeroImages[program.title] ??
-            heroImage1, // default image if not mapped
-          programPath: `/programs/${program.id}`, // ProgramDetail route
+      ? programs.slice(0, 3).map((program) => ({
+          title: program.title,
+          subtitle: program.description,
+          image: programHeroImages[program.title] ?? heroImage1,
+          programPath: `/programs/${program.id}`,
         }))
       : null;
 
-  const slidesToRender = programSlides && programSlides.length > 0
-    ? programSlides
-    : fallbackSlides;
+  const slidesToRender =
+    programSlides && programSlides.length > 0 ? programSlides : fallbackSlides;
 
+  // ✅ Safe prefers-reduced-motion handling (no SSR / TS issues)
   useEffect(() => {
+    if (typeof window === "undefined" || typeof window.matchMedia !== "function") {
+      return;
+    }
+
     const mediaQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
     setPrefersReducedMotion(mediaQuery.matches);
 
-    const handleChange = (e: MediaQueryListEvent) => {
-      setPrefersReducedMotion(e.matches);
+    const handleChange = (event: any) => {
+      const matches = event?.matches ?? mediaQuery.matches;
+      setPrefersReducedMotion(matches);
     };
 
-    mediaQuery.addEventListener("change", handleChange);
-    return () => mediaQuery.removeEventListener("change", handleChange);
+    if (typeof mediaQuery.addEventListener === "function") {
+      mediaQuery.addEventListener("change", handleChange);
+      return () => mediaQuery.removeEventListener("change", handleChange);
+    } else if (typeof mediaQuery.addListener === "function") {
+      // older browsers
+      mediaQuery.addListener(handleChange);
+      return () => mediaQuery.removeListener(handleChange);
+    }
   }, []);
 
   return (
@@ -99,6 +109,7 @@ export default function HeroCarousel() {
         navigation={false}
         pagination={{
           clickable: true,
+          // classes still picked up by Swiper CSS, plus your Tailwind tweaks
           bulletClass: "swiper-pagination-bullet !bg-white/50",
           bulletActiveClass: "swiper-pagination-bullet-active !bg-white",
         }}
@@ -109,9 +120,7 @@ export default function HeroCarousel() {
         }
         speed={prefersReducedMotion ? 0 : 450}
         onSwiper={setSwiper}
-        onSlideChange={(swiperInstance) =>
-          setActiveIndex(swiperInstance.activeIndex)
-        }
+        onSlideChange={(swiperInstance) => setActiveIndex(swiperInstance.activeIndex)}
         className="h-full"
       >
         {slidesToRender.map((slide, index) => (
@@ -191,7 +200,7 @@ export default function HeroCarousel() {
                         ease: [0.22, 1, 0.36, 1],
                       }}
                     >
-                      {/* Primary: scroll to programs */}
+                      {/* 🔘 Our Programs – open /programs page */}
                       <Button
                         size="lg"
                         variant="default"
@@ -199,10 +208,10 @@ export default function HeroCarousel() {
                         asChild
                         data-testid="button-hero-primary"
                       >
-                        <a href="#programs">Our Programs</a>
+                        <Link href="/programs">Our Programs</Link>
                       </Button>
 
-                      {/* Secondary: go to this specific program detail */}
+                      {/* 🔘 Learn More – uses slide.programPath */}
                       <Button
                         size="lg"
                         variant="outline"
@@ -210,7 +219,7 @@ export default function HeroCarousel() {
                         asChild
                         data-testid="button-hero-secondary"
                       >
-                        <a href={slide.programPath}>Learn More</a>
+                        <Link href={slide.programPath}>Learn More</Link>
                       </Button>
                     </motion.div>
                   </motion.div>

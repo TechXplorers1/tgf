@@ -1,3 +1,5 @@
+// client/src/components/AdminLayout.tsx
+
 import { ReactNode } from "react";
 import { Link, useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
@@ -8,6 +10,7 @@ import {
   Mail,
   LogOut,
 } from "lucide-react";
+import { useAuth } from "@/lib/auth";
 
 type AdminLayoutProps = {
   children: ReactNode;
@@ -22,7 +25,16 @@ const navItems = [
 ];
 
 export default function AdminLayout({ children }: AdminLayoutProps) {
-  const [location] = useLocation();
+  const [location, navigate] = useLocation();
+  const { logout } = useAuth();
+
+  const handleLogout = () => {
+    const confirmed = window.confirm("Are you sure you want to logout?");
+    if (!confirmed) return;
+
+    logout();
+    navigate("/admin/login");
+  };
 
   return (
     <div className="min-h-screen flex bg-muted/10">
@@ -56,7 +68,12 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
         </nav>
 
         <div className="p-4 border-t">
-          <Button variant="outline" size="sm" className="w-full justify-center">
+          <Button
+            variant="outline"
+            size="sm"
+            className="w-full justify-center"
+            onClick={handleLogout}
+          >
             <LogOut className="h-4 w-4 mr-2" />
             Logout
           </Button>

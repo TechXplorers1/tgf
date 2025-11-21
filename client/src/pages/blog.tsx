@@ -18,10 +18,10 @@ import { format } from "date-fns";
 import blogImage from "@assets/generated_images/Adult_literacy_project_showcase_171ac1d0.png";
 
 export default function Blog() {
-  // --- SAMPLE DATA (replace with API data when needed) ---
+  // --- SAMPLE DATA (type-safe with BlogPost) ---
   const blogPosts: BlogPost[] = [
     {
-      id: 1,
+      id: "1",
       title: "Empowering Women through Rural Education Programs",
       category: "Education",
       excerpt:
@@ -40,10 +40,11 @@ One participant, Amina, says:
 
 This initiative will be extended to 3 more villages in the coming months.`,
       readTime: 5,
-      publishedAt: "2025-02-10T10:00:00Z",
+      image: blogImage,
+      publishedAt: new Date("2025-02-10T10:00:00Z"),
     },
     {
-      id: 2,
+      id: "2",
       title: "Health Camps Reached 4,200 Families Last Month",
       category: "Health",
       excerpt:
@@ -59,10 +60,11 @@ Volunteer doctors, nurses, and local health workers are making a tremendous diff
 
 Our next goal: Provide basic medical insurance to 1,000 families.`,
       readTime: 4,
-      publishedAt: "2025-02-05T08:00:00Z",
+      image: blogImage,
+      publishedAt: new Date("2025-02-05T08:00:00Z"),
     },
     {
-      id: 3,
+      id: "3",
       title: "Youth Leadership Program Expands Nationwide",
       category: "Youth",
       excerpt:
@@ -77,26 +79,10 @@ The Youth Leadership Program trains students in:
 
 65% of participants have already launched local initiatives like clean water projects, tutoring centers, and youth clubs.`,
       readTime: 3,
-      publishedAt: "2025-02-01T07:30:00Z",
+      image: blogImage,
+      publishedAt: new Date("2025-02-01T07:30:00Z"),
     },
   ];
-
-  const [selectedPost, setSelectedPost] = useState<BlogPost | null>(null);
-  const [scrollPositionBeforeOpen, setScrollPositionBeforeOpen] = useState(0);
-
-  const handleOpenPost = (post: BlogPost) => {
-    // Remember where user was
-    setScrollPositionBeforeOpen(window.scrollY);
-    // Scroll to top when opening
-    window.scrollTo({ top: 0, behavior: "smooth" });
-    setSelectedPost(post);
-  };
-
-  const handleClosePost = () => {
-    setSelectedPost(null);
-    // Scroll back to where user was
-    window.scrollTo({ top: scrollPositionBeforeOpen, behavior: "smooth" });
-  };
 
   const categories = [
     "All",
@@ -107,6 +93,31 @@ The Youth Leadership Program trains students in:
     "Gender",
     "Development",
   ];
+
+  const [selectedPost, setSelectedPost] = useState<BlogPost | null>(null);
+  const [scrollPositionBeforeOpen, setScrollPositionBeforeOpen] = useState(0);
+  const [activeCategory, setActiveCategory] = useState<string>("All");
+
+  // Filter posts based on active category
+  const filteredPosts =
+    activeCategory === "All"
+      ? blogPosts
+      : blogPosts.filter((post) => post.category === activeCategory);
+
+  const handleOpenPost = (post: BlogPost) => {
+    if (typeof window !== "undefined") {
+      setScrollPositionBeforeOpen(window.scrollY);
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+    setSelectedPost(post);
+  };
+
+  const handleClosePost = () => {
+    setSelectedPost(null);
+    if (typeof window !== "undefined") {
+      window.scrollTo({ top: scrollPositionBeforeOpen, behavior: "smooth" });
+    }
+  };
 
   return (
     <div className="min-h-screen bg-background overflow-x-hidden">
@@ -135,84 +146,95 @@ The Youth Leadership Program trains students in:
         {/* Blog List Section */}
         <section className="py-16 md:py-24 bg-background">
           <div className="container mx-auto px-4 max-w-7xl">
-            {/* Categories Filter (UI only for now) */}
+            {/* Categories Filter */}
             <div className="flex flex-wrap justify-center gap-3 mb-12">
-              {categories.map((category) => (
-                <Badge
-                  key={category}
-                  variant="outline"
-                  className="px-4 py-2 cursor-pointer font-sans"
-                >
-                  {category}
-                </Badge>
-              ))}
+              {categories.map((category) => {
+                const isActive = activeCategory === category;
+                return (
+                  <Badge
+                    key={category}
+                    variant={isActive ? "default" : "outline"}
+                    className={`px-4 py-2 cursor-pointer font-sans transition-all ${
+                      isActive
+                        ? "bg-primary text-primary-foreground"
+                        : "hover:bg-primary/10"
+                    }`}
+                    onClick={() => setActiveCategory(category)}
+                  >
+                    {category}
+                  </Badge>
+                );
+              })}
             </div>
 
             {/* Blog Cards Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {blogPosts.map((post, index) => (
-                <motion.div
-                  key={post.id}
-                  initial={{ opacity: 0, y: 30 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.45, delay: index * 0.05 }}
-                >
-                  <Card className="hover-elevate active-elevate-2 overflow-hidden flex flex-col">
-                    {/* Slightly smaller image */}
-                    <div className="relative h-40 md:h-48 overflow-hidden">
-                      <motion.img
-                        src={blogImage}
-                        alt={post.title}
-                        className="w-full h-full object-cover object-center"
-                        whileHover={{ scale: 1.05 }}
-                        transition={{ duration: 0.3 }}
-                      />
-                      <Badge className="absolute top-3 left-3">
-                        {post.category}
-                      </Badge>
-                    </div>
-
-                    <CardContent className="p-6 flex-1">
-                      <div className="flex flex-wrap items-center gap-4 text-sm text-muted-foreground mb-3">
-                        <div className="flex items-center gap-1">
-                          <Calendar className="h-4 w-4" />
-                          <span>
-                            {format(
-                              new Date(post.publishedAt),
-                              "MMMM dd, yyyy"
-                            )}
-                          </span>
-                        </div>
-                        <div className="flex items-center gap-1">
-                          <Clock className="h-4 w-4" />
-                          <span>{post.readTime} min read</span>
-                        </div>
+            {filteredPosts.length === 0 ? (
+              <p className="text-center text-muted-foreground">
+                No articles found for this category yet.
+              </p>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                {filteredPosts.map((post, index) => (
+                  <motion.div
+                    key={post.id}
+                    initial={{ opacity: 0, y: 30 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.45, delay: index * 0.05 }}
+                  >
+                    <Card className="hover-elevate active-elevate-2 overflow-hidden flex flex-col">
+                      {/* Image */}
+                      <div className="relative h-40 md:h-48 overflow-hidden">
+                        <motion.img
+                          src={post.image}
+                          alt={post.title}
+                          className="w-full h-full object-cover object-center"
+                          whileHover={{ scale: 1.05 }}
+                          transition={{ duration: 0.3 }}
+                        />
+                        <Badge className="absolute top-3 left-3">
+                          {post.category}
+                        </Badge>
                       </div>
-                      <h3 className="font-heading text-xl font-semibold mb-2">
-                        {post.title}
-                      </h3>
-                      <p className="text-muted-foreground">{post.excerpt}</p>
-                    </CardContent>
 
-                    <CardFooter className="p-6 pt-0">
-                      <Button
-                        variant="ghost"
-                        className="group font-sans font-medium p-0 h-auto hover:bg-transparent"
-                        onClick={() => handleOpenPost(post)}
-                      >
-                        Read Article
-                        <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
-                      </Button>
-                    </CardFooter>
-                  </Card>
-                </motion.div>
-              ))}
-            </div>
+                      <CardContent className="p-6 flex-1">
+                        <div className="flex flex-wrap items-center gap-4 text-sm text-muted-foreground mb-3">
+                          <div className="flex items-center gap-1">
+                            <Calendar className="h-4 w-4" />
+                            <span>
+                              {format(post.publishedAt, "MMMM dd, yyyy")}
+                            </span>
+                          </div>
+                          <div className="flex items-center gap-1">
+                            <Clock className="h-4 w-4" />
+                            <span>{post.readTime} min read</span>
+                          </div>
+                        </div>
+                        <h3 className="font-heading text-xl font-semibold mb-2">
+                          {post.title}
+                        </h3>
+                        <p className="text-muted-foreground">{post.excerpt}</p>
+                      </CardContent>
+
+                      <CardFooter className="p-6 pt-0">
+                        <Button
+                          variant="ghost"
+                          className="group font-sans font-medium p-0 h-auto hover:bg-transparent"
+                          onClick={() => handleOpenPost(post)}
+                        >
+                          Read Article
+                          <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
+                        </Button>
+                      </CardFooter>
+                    </Card>
+                  </motion.div>
+                ))}
+              </div>
+            )}
           </div>
         </section>
       </main>
 
-      {/* Article Popup with scrollbar & back behavior */}
+      {/* Article Popup */}
       <Dialog
         open={!!selectedPost}
         onOpenChange={(open) => {
@@ -222,10 +244,10 @@ The Youth Leadership Program trains students in:
         <DialogContent className="max-w-3xl w-full p-0 overflow-hidden">
           {selectedPost && (
             <div className="flex flex-col max-h-[90vh]">
-              {/* Image (fixed area, no scroll) */}
+              {/* Image */}
               <div className="relative h-48 md:h-56 w-full overflow-hidden flex-shrink-0">
                 <img
-                  src={blogImage}
+                  src={selectedPost.image}
                   alt={selectedPost.title}
                   className="w-full h-full object-cover object-center"
                 />
@@ -246,10 +268,7 @@ The Youth Leadership Program trains students in:
                   <div className="flex items-center gap-1">
                     <Calendar className="h-4 w-4" />
                     <span>
-                      {format(
-                        new Date(selectedPost.publishedAt),
-                        "MMMM dd, yyyy"
-                      )}
+                      {format(selectedPost.publishedAt, "MMMM dd, yyyy")}
                     </span>
                   </div>
                   <div className="flex items-center gap-1">
@@ -258,7 +277,7 @@ The Youth Leadership Program trains students in:
                   </div>
                 </div>
 
-                {/* FULL CONTENT */}
+                {/* Full content */}
                 <div className="space-y-4 text-muted-foreground leading-relaxed font-sans">
                   {selectedPost.content.split("\n\n").map((para, i) => (
                     <p key={i}>{para}</p>

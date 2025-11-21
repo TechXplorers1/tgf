@@ -77,7 +77,7 @@ export default function Contact() {
       icon: Phone,
       title: "Phone",
       content: "+256 123 456 789",
-      description: "Mon-Fri from 8am to 5pm EAT",
+      description: "Mon–Fri from 8am to 5pm EAT",
     },
     {
       icon: MapPin,
@@ -88,8 +88,8 @@ export default function Contact() {
     {
       icon: Clock,
       title: "Working Hours",
-      content: "Monday - Friday",
-      description: "8:00 AM - 5:00 PM EAT",
+      content: "Monday – Friday",
+      description: "8:00 AM – 5:00 PM EAT",
     },
   ];
 
@@ -97,19 +97,20 @@ export default function Contact() {
     <div className="min-h-screen bg-background overflow-x-hidden">
       <Header />
 
-      <main className="pt-24">
-        <section className="relative py-20 md:py-32 bg-gradient-to-br from-primary/10 to-primary/5">
+      <main className="pt-28 md:pt-32">
+        {/* Hero Section */}
+        <section className="py-16 md:py-20 bg-gradient-to-br from-primary/10 to-primary/5">
           <div className="container mx-auto px-4">
             <motion.div
               className="max-w-4xl mx-auto text-center"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
+              transition={{ duration: 0.45 }}
             >
-              <h1 className="font-heading font-bold text-4xl md:text-5xl lg:text-6xl mb-6">
+              <h1 className="font-heading font-bold text-4xl md:text-5xl lg:text-6xl mb-4">
                 Get in Touch
               </h1>
-              <p className="font-sans text-lg md:text-xl text-muted-foreground">
+              <p className="font-sans text-base md:text-lg text-muted-foreground max-w-2xl mx-auto">
                 Have questions or want to get involved? We'd love to hear from
                 you.
               </p>
@@ -117,43 +118,32 @@ export default function Contact() {
           </div>
         </section>
 
+        {/* Form and Contact Info */}
         <section className="py-16 md:py-24 bg-background">
           <div className="container mx-auto px-4">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 max-w-6xl mx-auto">
-              {/* Form */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 max-w-6xl mx-auto items-start">
+              {/* Contact Form */}
               <motion.div
                 initial={{ opacity: 0, x: -30 }}
                 animate={{ opacity: 1, x: 0 }}
-                transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
+                transition={{ duration: 0.45 }}
+                className="space-y-6"
               >
-                <h2 className="font-heading font-bold text-3xl mb-4">
-                  Send us a message
-                </h2>
-                <p className="font-sans text-muted-foreground mb-8">
-                  Fill out the form below and we'll get back to you within 24
-                  hours.
+                <h2 className="font-heading font-bold text-3xl mb-2">Send us a message</h2>
+                <p className="text-sm md:text-base text-muted-foreground mb-6">
+                  Fill out the form below and we'll get back to you within 24 hours.
                 </p>
 
                 <Form {...form}>
-                  <form
-                    onSubmit={form.handleSubmit(onSubmit)}
-                    className="space-y-6"
-                  >
+                  <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-5">
                     <FormField
                       control={form.control}
                       name="name"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel className="font-sans font-medium">
-                            Your Name
-                          </FormLabel>
+                          <FormLabel>Your Name</FormLabel>
                           <FormControl>
-                            <Input
-                              placeholder="John Doe"
-                              {...field}
-                              className="font-sans"
-                              data-testid="input-contact-name"
-                            />
+                            <Input placeholder="John Doe" {...field} />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -165,17 +155,9 @@ export default function Contact() {
                       name="email"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel className="font-sans font-medium">
-                            Email Address
-                          </FormLabel>
+                          <FormLabel>Email Address</FormLabel>
                           <FormControl>
-                            <Input
-                              type="email"
-                              placeholder="john@example.com"
-                              {...field}
-                              className="font-sans"
-                              data-testid="input-contact-email"
-                            />
+                            <Input type="email" placeholder="john@example.com" {...field} />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -187,16 +169,9 @@ export default function Contact() {
                       name="subject"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel className="font-sans font-medium">
-                            Subject
-                          </FormLabel>
+                          <FormLabel>Subject</FormLabel>
                           <FormControl>
-                            <Input
-                              placeholder="How can we help?"
-                              {...field}
-                              className="font-sans"
-                              data-testid="input-contact-subject"
-                            />
+                            <Input placeholder="How can we help?" {...field} />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -208,16 +183,13 @@ export default function Contact() {
                       name="message"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel className="font-sans font-medium">
-                            Message
-                          </FormLabel>
+                          <FormLabel>Message</FormLabel>
                           <FormControl>
                             <Textarea
                               placeholder="Tell us more about your inquiry..."
                               rows={6}
                               {...field}
-                              className="font-sans resize-none"
-                              data-testid="input-contact-message"
+                              className="resize-none"
                             />
                           </FormControl>
                           <FormMessage />
@@ -228,23 +200,10 @@ export default function Contact() {
                     <Button
                       type="submit"
                       size="lg"
-                      className="w-full font-sans font-medium"
+                      className="w-full"
                       disabled={contactMutation.isPending}
-                      data-testid="button-contact-submit"
                     >
-                      {contactMutation.isPending ? (
-                        <span className="flex items-center">
-                          <div className="animate-spin h-4 w-4 border-2 border-current border-t-transparent rounded-full mr-2" />
-                          Sending...
-                        </span>
-                      ) : isSuccess ? (
-                        <span className="flex items-center">
-                          <CheckCircle className="h-4 w-4 mr-2" />
-                          Message Sent!
-                        </span>
-                      ) : (
-                        "Send Message"
-                      )}
+                      {contactMutation.isPending ? "Sending..." : isSuccess ? "Message Sent!" : "Send Message"}
                     </Button>
                   </form>
                 </Form>
@@ -252,101 +211,30 @@ export default function Contact() {
 
               {/* Contact Info */}
               <motion.div
-                className="space-y-6"
                 initial={{ opacity: 0, x: 30 }}
                 animate={{ opacity: 1, x: 0 }}
-                transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
+                transition={{ duration: 0.45 }}
+                className="space-y-4"
               >
-                <div>
-                  <h2 className="font-heading font-bold text-3xl mb-4">
-                    Contact Information
-                  </h2>
-                  <p className="font-sans text-muted-foreground mb-8">
-                    Reach out to us through any of these channels. We're here to
-                    help.
-                  </p>
-                </div>
-
-                <div className="space-y-4">
-                  {contactInfo.map((info, index) => {
-                    const Icon = info.icon;
-                    return (
-                      <motion.div
-                        key={index}
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{
-                          duration: 0.45,
-                          delay: index * 0.1,
-                          ease: [0.22, 1, 0.36, 1],
-                        }}
-                      >
-                        <Card className="p-6 hover-elevate active-elevate-2 transition-all">
-                          <div className="flex items-start space-x-4">
-                            <div className="bg-primary/10 p-3 rounded-lg">
-                              <Icon className="h-6 w-6 text-primary" />
-                            </div>
-                            <div>
-                              <h3 className="font-heading font-semibold text-lg mb-1">
-                                {info.title}
-                              </h3>
-                              <p className="font-sans font-medium text-foreground mb-1">
-                                {info.content}
-                              </p>
-                              <p className="font-sans text-sm text-muted-foreground">
-                                {info.description}
-                              </p>
-                            </div>
-                          </div>
-                        </Card>
-                      </motion.div>
-                    );
-                  })}
-                </div>
-
-                <Card className="p-6 bg-primary/5 border-primary/20">
-                  <h3 className="font-heading font-semibold text-lg mb-3">
-                    Need Immediate Assistance?
-                  </h3>
-                  <p className="font-sans text-sm text-muted-foreground mb-4">
-                    For urgent matters, please call us directly during business
-                    hours. We'll do our best to assist you right away.
-                  </p>
-                  <Button
-                    variant="outline"
-                    className="w-full font-sans font-medium"
-                    data-testid="button-call-now"
-                  >
-                    <Phone className="h-4 w-4 mr-2" />
-                    Call Now
-                  </Button>
-                </Card>
+                {contactInfo.map((info, index) => {
+                  const Icon = info.icon;
+                  return (
+                    <Card key={index} className="p-6 shadow-sm hover:shadow-md transition-all">
+                      <div className="flex items-start space-x-4">
+                        <div className="bg-primary/10 p-3 rounded-lg">
+                          <Icon className="h-6 w-6 text-primary" />
+                        </div>
+                        <div>
+                          <h3 className="font-heading font-semibold text-lg">{info.title}</h3>
+                          <p className="font-medium">{info.content}</p>
+                          <p className="text-sm text-muted-foreground">{info.description}</p>
+                        </div>
+                      </div>
+                    </Card>
+                  );
+                })}
               </motion.div>
             </div>
-          </div>
-        </section>
-
-        {/* Map / Location */}
-        <section className="py-16 bg-muted/30">
-          <div className="container mx-auto px-4">
-            <motion.div
-              className="max-w-4xl mx-auto"
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, amount: 0.3 }}
-              transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
-            >
-              <Card className="overflow-hidden">
-                <div className="aspect-video bg-muted relative">
-                  <div className="absolute inset-0 flex items-center justify-center">
-                    <MapPin className="h-16 w-16 text-muted-foreground" />
-                  </div>
-                  <p className="absolute bottom-4 left-4 right-4 text-center font-sans text-sm text-muted-foreground">
-                    Map placeholder - Visit us at our Kampala office
-                  </p>
-                </div>
-              </Card>
-            </motion.div>
           </div>
         </section>
       </main>

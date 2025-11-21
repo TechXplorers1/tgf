@@ -14,31 +14,52 @@ import Projects from "@/pages/projects";
 import Blog from "@/pages/blog";
 import Contact from "@/pages/contact";
 import NotFound from "@/pages/not-found";
-import ProgramDetail from "./pages/program-detail";
-import AdminDashboard from "@/pages/admin-dashboard"; // 👈 NEW
+import ProgramsPage from "@/pages/programs";        // 👈 new programs list page
+import ProgramDetail from "@/pages/program-detail"; // 👈 single program detail
+
+// Admin pages
+import AdminDashboard from "@/pages/admin-dashboard";
+import AdminLogin from "@/pages/admin-login";
+
+// Auth
+import { AuthProvider } from "@/lib/auth";
+import { RequireAuth } from "@/components/RequireAuth";
 
 function Router() {
   return (
     <>
       <Switch>
+        {/* Public routes */}
         <Route path="/" component={Home} />
         <Route path="/about" component={About} />
         <Route path="/projects" component={Projects} />
         <Route path="/blog" component={Blog} />
         <Route path="/contact" component={Contact} />
 
+        {/* Programs list page */}
+        <Route path="/programs" component={ProgramsPage} />
+
+        {/* Single program detail page */}
         <Route path="/programs/:id">
           {(params) => <ProgramDetail id={params.id} />}
         </Route>
 
-        {/* 👇 Admin Dashboard route */}
-        <Route path="/admin" component={AdminDashboard} />
+        {/* Public admin login */}
+        <Route path="/admin/login" component={AdminLogin} />
 
-        {/* 404 fallback */}
+        {/* PROTECTED: /admin -> dashboard, only if logged in */}
+        <Route path="/admin">
+          {() => (
+            <RequireAuth>
+              <AdminDashboard />
+            </RequireAuth>
+          )}
+        </Route>
+
+        {/* 404 */}
         <Route component={NotFound} />
       </Switch>
 
-      {/* Global scroll-to-top FAB */}
       <ScrollToTopButton />
     </>
   );
@@ -47,10 +68,12 @@ function Router() {
 function App() {
   return (
     <QueryClientProvider client={queryClient}>
-      <TooltipProvider>
-        <Toaster />
-        <Router />
-      </TooltipProvider>
+      <AuthProvider>
+        <TooltipProvider>
+          <Toaster />
+          <Router />
+        </TooltipProvider>
+      </AuthProvider>
     </QueryClientProvider>
   );
 }

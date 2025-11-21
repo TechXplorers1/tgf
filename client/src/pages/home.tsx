@@ -8,7 +8,7 @@ import StatsSection from "@/components/StatsSection";
 import ProgramsSection from "@/components/ProgramsSection";
 import StoriesSection from "@/components/StoriesSection";
 import { DonateSection } from "@/components/DonateSection";
-import ScrollToTopButton from "@/components/ScrollToTopButton";
+import TransparencySection from "@/components/TransparencySection";
 
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -169,7 +169,6 @@ export default function Home() {
     },
   ];
 
-  // Button handlers → open dialogs
   const handleSupportOurCauseClick = () => {
     setDonationProgram("general");
     setIsDonationDialogOpen(true);
@@ -194,9 +193,20 @@ export default function Home() {
       <Header />
 
       <main>
+        {/* Hero / stats / programs */}
         <HeroCarousel />
         <StatsSection />
         <ProgramsSection />
+
+        {/* Impact in Action – stories section (wired to popups) */}
+        <StoriesSection
+          onSupportChild={handleSupportOurCauseClick}
+          onVolunteer={handleVolunteerClick}
+          onPartner={handlePartnerClick}
+        />
+
+        {/* Transparency & Reports (new section) */}
+        <TransparencySection />
 
         {/* How You Can Help */}
         <section
@@ -274,8 +284,6 @@ export default function Home() {
             </div>
           </div>
         </section>
-
-        <StoriesSection />
 
         {/* Volunteer Form – Popup */}
         <Dialog
@@ -576,10 +584,9 @@ export default function Home() {
             </motion.div>
           </div>
         </section>
-      </main>
 
-      <ScrollToTopButton />
-      <Footer />
+        <Footer />
+      </main>
     </div>
   );
 }

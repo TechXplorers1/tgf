@@ -1,3 +1,5 @@
+// client/src/components/Footer.tsx
+
 import { Link } from "wouter";
 import {
   Facebook,
@@ -155,6 +157,7 @@ export default function Footer() {
 
       <div className="container mx-auto px-4 py-12 relative">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-8">
+          {/* Brand + social */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -213,6 +216,7 @@ export default function Footer() {
             </div>
           </motion.div>
 
+          {/* Quick links */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -240,6 +244,7 @@ export default function Footer() {
             </ul>
           </motion.div>
 
+          {/* Programs */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -266,6 +271,7 @@ export default function Footer() {
             </ul>
           </motion.div>
 
+          {/* Newsletter + contact */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -342,7 +348,7 @@ export default function Footer() {
         </div>
       </div>
 
-      {/* Policy / Terms Modal */}
+      {/* Single Policy / Terms Modal */}
       {openModal && (
         <div
           className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 px-4"
