@@ -9,7 +9,7 @@ import {
 
 type AuthContextType = {
   isAuthenticated: boolean;
-  login: (token: string) => void;
+  login: (email: string, password: string) => Promise<boolean>;
   logout: () => void;
 };
 
@@ -26,10 +26,20 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   }, []);
 
-  const login = (token: string) => {
-    // Save token (JWT or random string) from backend
-    localStorage.setItem("admin_token", token);
+  // Simple demo login – replace with real API later if you want
+  const login = async (email: string, password: string): Promise<boolean> => {
+    // ✅ demo credentials – same as on your login screen
+    const isValid =
+      email === "test@mail.in" && password === "1234567890";
+
+    if (!isValid) {
+      return false;
+    }
+
+    // Save any token/jwt here – using a dummy value for now
+    localStorage.setItem("admin_token", "demo_admin_token");
     setIsAuthenticated(true);
+    return true;
   };
 
   const logout = () => {

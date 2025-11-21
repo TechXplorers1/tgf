@@ -11,20 +11,33 @@ import { Label } from "@/components/ui/label";
 import { useAuth } from "@/lib/auth";
 
 const AdminLogin = () => {
-  const { login, loading, error } = useAuth();
+  const { login } = useAuth();
   const [, navigate] = useLocation();
 
-  // Prefill with demo credentials (you can clear these if you want)
+  // Prefill with demo credentials (you can change/clear these)
   const [email, setEmail] = useState("test@mail.in");
   const [password, setPassword] = useState("1234567890");
   const [showPassword, setShowPassword] = useState(false);
 
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
+    if (loading) return;
+
+    setLoading(true);
+    setError(null);
+
     const success = await login(email, password);
+
     if (success) {
       navigate("/admin");
+    } else {
+      setError("Invalid email or password. Please try again.");
     }
+
+    setLoading(false);
   };
 
   return (

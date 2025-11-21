@@ -1,6 +1,7 @@
 // client/src/App.tsx
 
-import { Switch, Route } from "wouter";
+import { useEffect } from "react";
+import { Switch, Route, useLocation } from "wouter";
 import { queryClient } from "./lib/queryClient";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
@@ -25,9 +26,27 @@ import AdminLogin from "@/pages/admin-login";
 import { AuthProvider } from "@/lib/auth";
 import { RequireAuth } from "@/components/RequireAuth";
 
+// 👇 Scroll to top on every route change
+function ScrollToTopOnRouteChange() {
+  const [location] = useLocation();
+
+  useEffect(() => {
+    window.scrollTo({
+      top: 0,
+      left: 0,
+      behavior: "auto", // change to "smooth" if you want animation
+    });
+  }, [location]);
+
+  return null;
+}
+
 function Router() {
   return (
     <>
+      {/* Auto scroll to top whenever path changes */}
+      <ScrollToTopOnRouteChange />
+
       <Switch>
         {/* Public routes */}
         <Route path="/" component={Home} />

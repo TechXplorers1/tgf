@@ -1,32 +1,32 @@
 // client/src/components/RequireAuth.tsx
 
 import type { ReactNode } from "react";
-import { Redirect } from "wouter";
-
-// ⬇️ If you already have useAuth in "@/lib/auth", you can use it here.
-// import { useAuth } from "@/lib/auth";
+import { useEffect } from "react";
+import { useLocation } from "wouter";
+import { useAuth } from "@/lib/auth";
 
 type RequireAuthProps = {
   children: ReactNode;
 };
 
 /**
- * Simple route guard for admin routes.
- * Right now this is a very basic version: it just checks a token in localStorage.
- * You can replace this logic with your real AuthContext / useAuth hook.
+ * Route guard for admin routes.
+ * Uses AuthContext (useAuth) + localStorage-backed state from AuthProvider.
  */
 export function RequireAuth({ children }: RequireAuthProps) {
-  // ✅ Replace this block with your real auth logic later
-  let isAuthed = false;
+  const { isAuthenticated } = useAuth();
+  const [, navigate] = useLocation();
 
-  if (typeof window !== "undefined") {
-    const token = window.localStorage.getItem("adminToken");
-    isAuthed = !!token;
-  }
+  // If not authenticated, send to admin login
+  useEffect(() => {
+    if (!isAuthenticated) {
+      navigate("/admin/login");
+    }
+  }, [isAuthenticated, navigate]);
 
-  // Not logged in → send to admin login page
-  if (!isAuthed) {
-    return <Redirect to="/admin/login" />;
+  // While not authenticated / redirecting, render nothing (or a loader)
+  if (!isAuthenticated) {
+    return null;
   }
 
   // Logged in → show protected content
