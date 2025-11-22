@@ -1,4 +1,6 @@
-import { useState } from "react";
+// client/src/pages/program-detail.tsx (or wherever this lives)
+
+import { useState, useEffect } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import type {
   Program,
@@ -71,11 +73,7 @@ const defaultExtra: ProgramExtra = {
     "Build local capacity",
     "Create sustainable systems beyond project funding",
   ],
-  impactAreas: [
-    "Community awareness",
-    "Partnerships",
-    "Long-term resilience",
-  ],
+  impactAreas: ["Community awareness", "Partnerships", "Long-term resilience"],
   stats: [
     { label: "People Reached", value: "1,500+" },
     { label: "Communities", value: "10+" },
@@ -172,13 +170,24 @@ export default function ProgramDetail({ id }: ProgramDetailProps) {
     },
   });
 
+  // 🔁 Keep subject in sync when program changes (after data load)
+  useEffect(() => {
+    volunteerForm.setValue(
+      "subject",
+      `I’d like to volunteer for ${program?.title || "COMAGEND"}`
+    );
+  }, [program?.title, volunteerForm]);
+
   const volunteerMutation = useMutation({
     mutationFn: async (data: InsertContactMessage) => {
       return await apiRequest("POST", "/api/contact", data);
     },
     onSuccess: () => {
       setVolunteerSuccess(true);
-      toast({ title: "Thank you for volunteering!", description: "We'll contact you soon." });
+      toast({
+        title: "Thank you for volunteering!",
+        description: "We'll contact you soon.",
+      });
       volunteerForm.reset({
         name: "",
         email: "",
@@ -186,6 +195,15 @@ export default function ProgramDetail({ id }: ProgramDetailProps) {
         message: "",
       });
       setTimeout(() => setVolunteerSuccess(false), 3000);
+    },
+    onError: (err: any) => {
+      toast({
+        title: "Error",
+        description:
+          err?.message ||
+          "Failed to submit your volunteer interest. Please try again.",
+        variant: "destructive",
+      });
     },
   });
 
@@ -196,10 +214,9 @@ export default function ProgramDetail({ id }: ProgramDetailProps) {
     <div className="min-h-screen bg-background overflow-x-hidden">
       <Header />
 
-      <main className="pt-32 pb-16"> {/* Increased from pt-24 to prevent header overlap */}
+      <main className="pt-32 pb-16">
         <div className="container mx-auto px-4">
-
-          {/* Back Button (Now goes to Home) */}
+          {/* Back Button */}
           <div className="mb-6">
             <Link href="/">
               <Button
@@ -213,7 +230,7 @@ export default function ProgramDetail({ id }: ProgramDetailProps) {
             </Link>
           </div>
 
-          {/* Loading/Error UI */}
+          {/* Loading / Error / Content */}
           {isLoading ? (
             <div className="grid md:grid-cols-2 gap-10">
               <Skeleton className="w-full h-72" />
@@ -226,9 +243,11 @@ export default function ProgramDetail({ id }: ProgramDetailProps) {
             </div>
           ) : error || !program ? (
             <div className="text-center py-20">
-              <p className="text-muted-foreground">Unable to load this program.</p>
+              <p className="text-muted-foreground">
+                Unable to load this program.
+              </p>
               <Link href="/">
-                <Button>Back to Home</Button>
+                <Button className="mt-4">Back to Home</Button>
               </Link>
             </div>
           ) : (
@@ -252,7 +271,7 @@ export default function ProgramDetail({ id }: ProgramDetailProps) {
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.4, delay: 0.1 }}
                 >
-                  <span className="px-3 py-1 rounded-full bg-primary/10 text-primary text-xs font-semibold mb-3">
+                  <span className="inline-block px-3 py-1 rounded-full bg-primary/10 text-primary text-xs font-semibold mb-3">
                     {program.category}
                   </span>
 
@@ -260,12 +279,19 @@ export default function ProgramDetail({ id }: ProgramDetailProps) {
                     {program.title}
                   </h1>
 
-                  <p className="text-muted-foreground mb-4 text-lg">{program.description}</p>
+                  <p className="text-muted-foreground mb-4 text-lg">
+                    {program.description}
+                  </p>
 
-                  <p className="text-foreground/90 mb-6">{extra.longDescription}</p>
+                  <p className="text-foreground/90 mb-6">
+                    {extra.longDescription}
+                  </p>
 
-                  <div className="flex gap-3">
-                    <Button size="lg" onClick={() => setIsDonationDialogOpen(true)}>
+                  <div className="flex flex-wrap gap-3">
+                    <Button
+                      size="lg"
+                      onClick={() => setIsDonationDialogOpen(true)}
+                    >
                       Support This Program
                     </Button>
                     <Button
@@ -288,7 +314,9 @@ export default function ProgramDetail({ id }: ProgramDetailProps) {
                       key={stat.label}
                       className="rounded-xl border p-4 shadow-sm bg-card"
                     >
-                      <p className="text-sm text-muted-foreground">{stat.label}</p>
+                      <p className="text-sm text-muted-foreground">
+                        {stat.label}
+                      </p>
                       <p className="text-2xl font-heading">{stat.value}</p>
                     </div>
                   ))}
@@ -320,33 +348,49 @@ export default function ProgramDetail({ id }: ProgramDetailProps) {
       </main>
 
       {/* Donation Popup */}
-      <Dialog open={isDonationDialogOpen} onOpenChange={setIsDonationDialogOpen}>
-        <DialogContent className="w-[95vw] max-w-3xl p-0">
+      <Dialog
+        open={isDonationDialogOpen}
+        onOpenChange={setIsDonationDialogOpen}
+      >
+        <DialogContent className="w-[95vw] max-w-3xl max-h-[90vh] overflow-y-auto p-0">
           <DonateSection initialProgram={donationProgram} />
         </DialogContent>
       </Dialog>
 
       {/* Volunteer Popup */}
-      <Dialog open={isVolunteerDialogOpen} onOpenChange={setIsVolunteerDialogOpen}>
+      <Dialog
+        open={isVolunteerDialogOpen}
+        onOpenChange={setIsVolunteerDialogOpen}
+      >
         <DialogContent className="w-[95vw] max-w-lg max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>Volunteer With Us</DialogTitle>
             <DialogDescription>
-              Share your details and we’ll connect with you.
+              Share your details and we’ll connect with you about volunteering
+              for this program.
             </DialogDescription>
           </DialogHeader>
 
           <Form {...volunteerForm}>
             <form
               onSubmit={volunteerForm.handleSubmit(handleVolunteerSubmit)}
-              className="space-y-6"
+              className="space-y-5 pb-2"
             >
+              {/* Hidden subject field so schema is satisfied */}
+              <FormField
+                control={volunteerForm.control}
+                name="subject"
+                render={({ field }) => (
+                  <input type="hidden" {...field} value={field.value} />
+                )}
+              />
+
               <FormField
                 control={volunteerForm.control}
                 name="name"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Name</FormLabel>
+                    <FormLabel>Full Name</FormLabel>
                     <FormControl>
                       <Input {...field} placeholder="Your name" />
                     </FormControl>
@@ -362,7 +406,11 @@ export default function ProgramDetail({ id }: ProgramDetailProps) {
                   <FormItem>
                     <FormLabel>Email</FormLabel>
                     <FormControl>
-                      <Input {...field} type="email" placeholder="you@example.com" />
+                      <Input
+                        {...field}
+                        type="email"
+                        placeholder="you@example.com"
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -374,18 +422,46 @@ export default function ProgramDetail({ id }: ProgramDetailProps) {
                 name="message"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Message</FormLabel>
+                    <FormLabel>
+                      How would you like to help with this program?
+                    </FormLabel>
                     <FormControl>
-                      <Textarea rows={4} {...field} placeholder="How would you like to help?" />
+                      <Textarea
+                        rows={4}
+                        {...field}
+                        placeholder="Tell us about your skills, availability, and interests..."
+                        className="min-h-[120px]"
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
               />
 
-              <Button type="submit" className="w-full">
-                Submit
-              </Button>
+              {volunteerSuccess && (
+                <div className="flex items-center gap-2 text-sm text-emerald-600">
+                  <CheckCircle className="w-4 h-4" />
+                  <span>Thank you! We’ll be in touch soon.</span>
+                </div>
+              )}
+
+              <div className="flex justify-end gap-2 pt-2">
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => setIsVolunteerDialogOpen(false)}
+                >
+                  Cancel
+                </Button>
+                <Button
+                  type="submit"
+                  disabled={volunteerMutation.isPending}
+                >
+                  {volunteerMutation.isPending
+                    ? "Submitting..."
+                    : "Submit Interest"}
+                </Button>
+              </div>
             </form>
           </Form>
         </DialogContent>
