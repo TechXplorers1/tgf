@@ -1,6 +1,6 @@
 // client/src/pages/home.tsx
 
-import { useState, useEffect } from "react"; // ⬅️ add useEffect here
+import { useState, useEffect } from "react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import HeroCarousel from "@/components/HeroCarousel";
@@ -43,18 +43,18 @@ import { Link } from "wouter";
 export default function Home() {
   const { toast } = useToast();
 
-  // 🔽 NEW: scroll to #get-involved-section when arriving with hash
+  // 🔽 Auto Scroll to target section when hash is used
   useEffect(() => {
     if (window.location.hash === "#get-involved-section") {
       const el = document.getElementById("get-involved-section");
       if (el) {
-        setTimeout(() => {
-          el.scrollIntoView({ behavior: "smooth", block: "start" });
-        }, 100); // small delay so layout is ready
+        setTimeout(
+          () => el.scrollIntoView({ behavior: "smooth", block: "start" }),
+          100
+        );
       }
     }
   }, []);
-  // 🔼
 
   // Donation popup
   const [donationProgram, setDonationProgram] =
@@ -76,37 +76,21 @@ export default function Home() {
   });
 
   const volunteerMutation = useMutation({
-    mutationFn: async (data: InsertContactMessage) => {
-      return await apiRequest("POST", "/api/contact", data);
-    },
+    mutationFn: async (data: InsertContactMessage) =>
+      await apiRequest("POST", "/api/contact", data),
     onSuccess: () => {
       setVolunteerSuccess(true);
       toast({
         title: "Thank you for volunteering!",
         description: "Our team will contact you within 24 hours.",
       });
-      volunteerForm.reset({
-        name: "",
-        email: "",
-        subject: "I’d like to volunteer with COMAGEND",
-        message: "",
-      });
+      volunteerForm.reset();
       setTimeout(() => setVolunteerSuccess(false), 3000);
-    },
-    onError: (error: any) => {
-      toast({
-        title: "Error",
-        description:
-          error.message ||
-          "Failed to submit your volunteer interest. Please try again.",
-        variant: "destructive",
-      });
     },
   });
 
-  const handleVolunteerSubmit = (data: InsertContactMessage) => {
+  const handleVolunteerSubmit = (data: InsertContactMessage) =>
     volunteerMutation.mutate(data);
-  };
 
   // Partner popup
   const [isPartnerDialogOpen, setIsPartnerDialogOpen] = useState(false);
@@ -123,38 +107,23 @@ export default function Home() {
   });
 
   const partnerMutation = useMutation({
-    mutationFn: async (data: InsertContactMessage) => {
-      return await apiRequest("POST", "/api/contact", data);
-    },
+    mutationFn: async (data: InsertContactMessage) =>
+      await apiRequest("POST", "/api/contact", data),
     onSuccess: () => {
       setPartnerSuccess(true);
       toast({
         title: "Thank you for your interest in partnering!",
-        description: "We’ll get back to you with partnership options soon.",
+        description: "We’ll get back to you soon.",
       });
-      partnerForm.reset({
-        name: "",
-        email: "",
-        subject: "I’d like to partner with COMAGEND",
-        message: "",
-      });
+      partnerForm.reset();
       setTimeout(() => setPartnerSuccess(false), 3000);
-    },
-    onError: (error: any) => {
-      toast({
-        title: "Error",
-        description:
-          error.message ||
-          "Failed to submit your partnership enquiry. Please try again.",
-        variant: "destructive",
-      });
     },
   });
 
-  const handlePartnerSubmit = (data: InsertContactMessage) => {
+  const handlePartnerSubmit = (data: InsertContactMessage) =>
     partnerMutation.mutate(data);
-  };
 
+  // CTA Cards
   const ctaCards = [
     {
       icon: HandHeart,
@@ -162,7 +131,6 @@ export default function Home() {
       description:
         "Your contribution helps us create lasting change in communities across Africa.",
       cta: "Make a Difference",
-      color: "bg-chart-2/10",
     },
     {
       icon: Users,
@@ -170,7 +138,6 @@ export default function Home() {
       description:
         "Join our team of dedicated volunteers and directly impact lives in your community.",
       cta: "Join Our Team",
-      color: "bg-chart-3/10",
     },
     {
       icon: Handshake,
@@ -178,22 +145,8 @@ export default function Home() {
       description:
         "Collaborate with COMAGEND to amplify our impact and reach more communities.",
       cta: "Become a Partner",
-      color: "bg-chart-4/10",
     },
   ];
-
-  const handleSupportOurCauseClick = () => {
-    setDonationProgram("general");
-    setIsDonationDialogOpen(true);
-  };
-
-  const handleVolunteerClick = () => {
-    setIsVolunteerDialogOpen(true);
-  };
-
-  const handlePartnerClick = () => {
-    setIsPartnerDialogOpen(true);
-  };
 
   const handleGetInvolvedTodayClick = () => {
     document
@@ -206,149 +159,250 @@ export default function Home() {
       <Header />
 
       <main>
-        {/* Hero / stats / programs */}
         <HeroCarousel />
         <StatsSection />
         <ProgramsSection />
 
-        {/* Impact in Action – stories section (wired to popups) */}
         <StoriesSection
-          onSupportChild={handleSupportOurCauseClick}
-          onVolunteer={handleVolunteerClick}
-          onPartner={handlePartnerClick}
+          onSupportChild={() => setIsDonationDialogOpen(true)}
+          onVolunteer={() => setIsVolunteerDialogOpen(true)}
+          onPartner={() => setIsPartnerDialogOpen(true)}
         />
 
-        {/* Transparency & Reports (new section) */}
         <TransparencySection />
 
-        {/* How You Can Help */}
-        <section
-          id="get-involved-section"
-          className="py-16 md:py-24 bg-background scroll-mt-32" // ⬅️ scroll-mt helps with fixed header
-        >
+        {/* CTA BUTTONS */}
+        <section id="get-involved-section" className="py-16 md:py-24">
           <div className="container mx-auto px-4">
             <motion.div
               className="text-center mb-12"
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, amount: 0.3 }}
-              transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
+              transition={{ duration: 0.45 }}
             >
-              <h2 className="font-heading font-bold text-3xl md:text-4xl mb-4">
+              <h2 className="text-3xl md:text-4xl font-bold">
                 How You Can Help
               </h2>
-              <p className="font-sans text-lg text-muted-foreground max-w-2xl mx-auto">
-                There are many ways to support our mission and make a meaningful
-                difference in the lives of those we serve.
+              <p className="text-muted-foreground max-w-xl mx-auto">
+                There are many ways to support our mission.
               </p>
             </motion.div>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-              {ctaCards.map((card, index) => {
+              {ctaCards.map((card, i) => {
                 const Icon = card.icon;
-                const isSupportOurCause = card.title === "Support Our Cause";
-                const isVolunteer = card.title === "Volunteer With Us";
-                const isPartner = card.title === "Partner With Us";
-
                 return (
-                  <motion.div
-                    key={index}
-                    initial={{ opacity: 0, y: 30 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: true, amount: 0.3 }}
-                    transition={{
-                      duration: 0.45,
-                      delay: index * 0.1,
-                      ease: [0.22, 1, 0.36, 1],
-                    }}
+                  <Card
+                    key={i}
+                    className="p-6 text-center flex flex-col hover:shadow-lg"
                   >
-                    <Card className="p-8 text-center h-full flex flex-col hover-elevate active-elevate-2 transition-all">
-                      <div
-                        className={`inline-flex p-4 rounded-lg ${card.color} mx-auto mb-6`}
-                      >
-                        <Icon className="h-8 w-8 text-foreground" />
-                      </div>
-                      <h3 className="font-heading font-semibold text-xl mb-3">
-                        {card.title}
-                      </h3>
-                      <p className="font-sans text-muted-foreground mb-6 flex-1">
-                        {card.description}
-                      </p>
-                      <Button
-                        variant="default"
-                        className="font-sans font-medium w-full"
-                        data-testid={`button-cta-${index}`}
-                        onClick={
-                          isSupportOurCause
-                            ? handleSupportOurCauseClick
-                            : isVolunteer
-                            ? handleVolunteerClick
-                            : isPartner
-                            ? handlePartnerClick
-                            : undefined
-                        }
-                      >
-                        {card.cta}
-                      </Button>
-                    </Card>
-                  </motion.div>
+                    <Icon className="h-10 w-10 mx-auto mb-4" />
+                    <h3 className="text-xl font-semibold mb-2">
+                      {card.title}
+                    </h3>
+                    <p className="text-muted-foreground flex-1">
+                      {card.description}
+                    </p>
+                    <Button
+                      className="mt-6 w-full"
+                      onClick={() =>
+                        card.title === "Support Our Cause"
+                          ? setIsDonationDialogOpen(true)
+                          : card.title === "Volunteer With Us"
+                          ? setIsVolunteerDialogOpen(true)
+                          : setIsPartnerDialogOpen(true)
+                      }
+                    >
+                      {card.cta}
+                    </Button>
+                  </Card>
                 );
               })}
             </div>
           </div>
         </section>
 
-        {/* (rest of your component stays exactly the same...) */}
-        {/* Volunteer Dialog, Partner Dialog, Donation Dialog, Final CTA, Footer */}
-        {/* ...the rest of your existing code below is unchanged */}
-        {/* Volunteer Form – Popup */}
-        {/* ... */}
-        {/* Partner Form – Popup */}
-        {/* ... */}
-        {/* Donation – Popup */}
-        {/* ... */}
-        {/* Final CTA */}
-        {/* ... */}
-        <section className="py-16 md:py-24 bg-primary text-primary-foreground">
-          <div className="container mx-auto px-4 text-center">
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, amount: 0.3 }}
-              transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
-            >
-              <h2 className="font-heading font-bold text-3xl md:text-4xl mb-4">
-                Ready to Make a Difference?
-              </h2>
-              <p className="font-sans text-lg text-primary-foreground/90 max-w-2xl mx-auto mb-8">
-                Join us in our mission to empower communities and create
-                sustainable change across Africa.
-              </p>
-              <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                <Button
-                  size="lg"
-                  variant="secondary"
-                  className="font-sans font-medium"
-                  data-testid="button-cta-get-involved"
-                  onClick={handleGetInvolvedTodayClick}
-                >
-                  Get Involved Today
-                </Button>
+        {/* DONATION POPUP */}
+        <Dialog open={isDonationDialogOpen} onOpenChange={setIsDonationDialogOpen}>
+          <DialogContent className="max-w-2xl max-h-[85vh] overflow-y-auto">
+            <DialogHeader>
+              <DialogTitle>Support Our Cause</DialogTitle>
+              <DialogDescription>
+                You are supporting: <strong>{donationProgram}</strong>
+              </DialogDescription>
+            </DialogHeader>
+            <DonateSection />
+          </DialogContent>
+        </Dialog>
 
-                <Link href="/about">
+        {/* VOLUNTEER POPUP */}
+        <Dialog open={isVolunteerDialogOpen} onOpenChange={setIsVolunteerDialogOpen}>
+          <DialogContent className="max-w-lg max-h-[85vh] overflow-y-auto">
+            <DialogHeader>
+              <DialogTitle>Volunteer With Us</DialogTitle>
+              <DialogDescription>
+                Fill the form and we will contact you.
+              </DialogDescription>
+            </DialogHeader>
+
+            <Form {...volunteerForm}>
+              <form
+                onSubmit={volunteerForm.handleSubmit(handleVolunteerSubmit)}
+                className="space-y-4 pb-4"
+              >
+                <FormField
+                  control={volunteerForm.control}
+                  name="name"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Name</FormLabel>
+                      <FormControl>
+                        <Input placeholder="Enter full name" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={volunteerForm.control}
+                  name="email"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Email</FormLabel>
+                      <FormControl>
+                        <Input
+                          type="email"
+                          placeholder="you@example.com"
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={volunteerForm.control}
+                  name="message"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>How would you like to help?</FormLabel>
+                      <FormControl>
+                        <Textarea
+                          className="min-h-[120px]"
+                          placeholder="Describe your interests and skills"
+                          {...field}
+                        />
+                      </FormControl>
+                    </FormItem>
+                  )}
+                />
+
+                {volunteerSuccess && (
+                  <p className="flex items-center text-green-600 text-sm">
+                    <CheckCircle className="h-4 w-4 mr-1" /> Submitted
+                    successfully!
+                  </p>
+                )}
+
+                <div className="flex justify-end gap-2">
                   <Button
-                    size="lg"
+                    type="button"
                     variant="outline"
-                    className="font-sans font-medium bg-transparent border-primary-foreground/20 text-primary-foreground hover:bg-primary-foreground/10"
-                    data-testid="button-cta-learn-more"
+                    onClick={() => setIsVolunteerDialogOpen(false)}
                   >
-                    Learn More About Us
+                    Cancel
                   </Button>
-                </Link>
-              </div>
-            </motion.div>
-          </div>
-        </section>
+                  <Button type="submit" disabled={volunteerMutation.isPending}>
+                    Submit
+                  </Button>
+                </div>
+              </form>
+            </Form>
+          </DialogContent>
+        </Dialog>
+
+        {/* PARTNER POPUP */}
+        <Dialog open={isPartnerDialogOpen} onOpenChange={setIsPartnerDialogOpen}>
+          <DialogContent className="max-w-lg max-h-[85vh] overflow-y-auto">
+            <DialogHeader>
+              <DialogTitle>Partner With Us</DialogTitle>
+              <DialogDescription>
+                Share organization details and partnership ideas.
+              </DialogDescription>
+            </DialogHeader>
+
+            <Form {...partnerForm}>
+              <form
+                onSubmit={partnerForm.handleSubmit(handlePartnerSubmit)}
+                className="space-y-4 pb-4"
+              >
+                <FormField
+                  control={partnerForm.control}
+                  name="name"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Contact Name</FormLabel>
+                      <FormControl>
+                        <Input placeholder="Enter name" {...field} />
+                      </FormControl>
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={partnerForm.control}
+                  name="email"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Work Email</FormLabel>
+                      <FormControl>
+                        <Input placeholder="you@company.com" {...field} />
+                      </FormControl>
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={partnerForm.control}
+                  name="message"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Partnership Details</FormLabel>
+                      <FormControl>
+                        <Textarea
+                          className="min-h-[120px]"
+                          placeholder="Tell us how you'd like to collaborate"
+                          {...field}
+                        />
+                      </FormControl>
+                    </FormItem>
+                  )}
+                />
+
+                {partnerSuccess && (
+                  <p className="flex items-center text-green-600 text-sm">
+                    <CheckCircle className="h-4 w-4 mr-1" /> Request submitted!
+                  </p>
+                )}
+
+                <div className="flex justify-end gap-2">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => setIsPartnerDialogOpen(false)}
+                  >
+                    Cancel
+                  </Button>
+                  <Button type="submit" disabled={partnerMutation.isPending}>
+                    Send
+                  </Button>
+                </div>
+              </form>
+            </Form>
+          </DialogContent>
+        </Dialog>
 
         <Footer />
       </main>
