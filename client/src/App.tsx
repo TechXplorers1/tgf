@@ -19,12 +19,16 @@ import Blog from "@/pages/blog";
 import Contact from "@/pages/contact";
 import NotFound from "@/pages/not-found";
 
+// Payment / receipt page
+import PaymentSuccess from "@/pages/payment-success";
+
 // Admin pages
 import AdminDashboard from "@/pages/admin-dashboard";
 import AdminPrograms from "@/pages/admin-programs";
 import AdminBlog from "@/pages/admin-blog";
-import AdminContacts from "@/pages/admin-contacts";
 import AdminLogin from "@/pages/admin-login";
+import AdminStaff from "@/pages/admin-staff";
+import AdminProjects from "@/pages/admin-projects";
 
 // Auth
 import { AuthProvider } from "@/lib/auth";
@@ -60,6 +64,9 @@ function Router() {
           {(params) => <ProgramDetail id={params.id} />}
         </Route>
 
+        {/* Payment success / invoice page */}
+        <Route path="/payment-success" component={PaymentSuccess} />
+
         {/* Admin Login (Public) */}
         <Route path="/admin/login" component={AdminLogin} />
 
@@ -88,10 +95,18 @@ function Router() {
           )}
         </Route>
 
-        <Route path="/admin/contacts">
+        <Route path="/admin/staff">
           {() => (
             <RequireAuth>
-              <AdminContacts />
+              <AdminStaff />
+            </RequireAuth>
+          )}
+        </Route>
+
+        <Route path="/admin/projects">
+          {() => (
+            <RequireAuth>
+              <AdminProjects />
             </RequireAuth>
           )}
         </Route>

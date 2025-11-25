@@ -27,6 +27,22 @@ type DonateSectionProps = {
   initialProgram?: InsertDonation["program"]; // "general" | "education" | "nutrition" | "healthcare"
 };
 
+// Helper: load Razorpay script dynamically
+const loadRazorpayScript = (): Promise<boolean> => {
+  return new Promise((resolve) => {
+    if (document.querySelector('script[src="https://checkout.razorpay.com/v1/checkout.js"]')) {
+      resolve(true);
+      return;
+    }
+
+    const script = document.createElement("script");
+    script.src = "https://checkout.razorpay.com/v1/checkout.js";
+    script.onload = () => resolve(true);
+    script.onerror = () => resolve(false);
+    document.body.appendChild(script);
+  });
+};
+
 export function DonateSection({ initialProgram }: DonateSectionProps) {
   const [selectedAmount, setSelectedAmount] = useState<number | null>(null);
   const [customAmount, setCustomAmount] = useState("");
@@ -50,29 +66,84 @@ export function DonateSection({ initialProgram }: DonateSectionProps) {
 
   const mutation = useMutation({
     mutationFn: async (data: InsertDonation) => {
-      const finalAmount = selectedAmount || parseInt(customAmount) || 0;
+      // Use finalAmount for saving on backend
+      const finalAmount =
+        data.amount && data.amount > 0
+          ? data.amount
+          : selectedAmount || parseInt(customAmount) || 0;
+
       return await apiRequest("POST", "/api/donation", {
         ...data,
         amount: finalAmount,
       });
     },
-    onSuccess: (response: any) => {
+  });
+
+  const handleRazorpayPayment = async (
+    donation: InsertDonation,
+    donationId: string,
+    amount: number
+  ) => {
+    const loaded = await loadRazorpayScript();
+
+    if (!loaded) {
       toast({
-        title: "Donation initiated successfully!",
-        description: `Donation ID: ${response.data.donationId}. In production, this would redirect to Stripe payment.`,
-      });
-      form.reset();
-      setSelectedAmount(null);
-      setCustomAmount("");
-    },
-    onError: (error: any) => {
-      toast({
-        title: "Donation failed",
-        description: error.message || "Please try again later.",
+        title: "Payment SDK failed to load",
+        description: "Please check your internet and try again.",
         variant: "destructive",
       });
-    },
-  });
+      return;
+    }
+
+    const keyId =
+      import.meta.env.VITE_RAZORPAY_KEY_ID || "rzp_test_xxxxxxxxxxxxx"; // <-- put your Razorpay TEST key here
+
+    const options: any = {
+      key: keyId,
+      amount: amount * 100, // amount in paise
+      currency: "INR",
+      name: "COMAGEND",
+      description: "Donation",
+      handler: function (response: any) {
+        // This is called after successful payment in TEST mode
+        toast({
+          title: "Payment successful!",
+          description: `Payment ID: ${response.razorpay_payment_id}`,
+        });
+
+        // Reset form & state
+        form.reset();
+        setSelectedAmount(null);
+        setCustomAmount("");
+
+        // Redirect to invoice / receipt page
+        const query = new URLSearchParams({
+          donationId: donationId,
+          paymentId: response.razorpay_payment_id,
+          email: donation.donorEmail || "",
+          name: donation.donorName || "",
+          amount: String(amount),
+          program: donation.program || "general",
+        }).toString();
+
+        window.location.href = `/payment-success?${query}`;
+      },
+      prefill: {
+        name: donation.donorName || "",
+        email: donation.donorEmail || "",
+      },
+      notes: {
+        donationId,
+        program: donation.program || "general",
+      },
+      theme: {
+        color: "#16a34a",
+      },
+    };
+
+    const razorpay = new (window as any).Razorpay(options);
+    razorpay.open();
+  };
 
   const onSubmit = (data: InsertDonation) => {
     const finalAmount = selectedAmount || parseInt(customAmount) || 0;
@@ -84,7 +155,29 @@ export function DonateSection({ initialProgram }: DonateSectionProps) {
       });
       return;
     }
-    mutation.mutate(data);
+
+    // Also set into form data so backend gets correct amount
+    data.amount = finalAmount;
+
+    mutation.mutate(data, {
+      onSuccess: async (response: any) => {
+        const donationId = response?.data?.donationId || "";
+
+        toast({
+          title: "Donation initiated!",
+          description: "Opening Razorpay test payment...",
+        });
+
+        await handleRazorpayPayment(data, donationId, finalAmount);
+      },
+      onError: (error: any) => {
+        toast({
+          title: "Donation failed",
+          description: error?.message || "Please try again later.",
+          variant: "destructive",
+        });
+      },
+    });
   };
 
   const handlePresetClick = (amount: number) => {
@@ -252,7 +345,7 @@ export function DonateSection({ initialProgram }: DonateSectionProps) {
                       Processing...
                     </>
                   ) : (
-                    "Proceed to Payment"
+                    "Proceed to Payment (Razorpay Test)"
                   )}
                 </Button>
 

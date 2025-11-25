@@ -1,13 +1,25 @@
 // client/src/pages/admin-dashboard.tsx
 
 import { useQuery } from "@tanstack/react-query";
-import type { Program, BlogPost, ContactMessage } from "@shared/schema";
+import type { Program, BlogPost } from "@shared/schema";
 import AdminLayout from "@/components/AdminLayout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
 import { ArrowRight } from "lucide-react";
 import { Link } from "wouter";
+
+type Staff = {
+  id: string;
+  name: string;
+  role: string;
+};
+
+type Project = {
+  id: string;
+  title: string;
+  status?: string | null;
+};
 
 export default function AdminDashboard() {
   const { data: programs, isLoading: isProgramsLoading, error: programsError } =
@@ -20,23 +32,25 @@ export default function AdminDashboard() {
       queryKey: ["/api/blog"],
     });
 
-  // 👇 match admin-contacts.tsx: /api/contact-messages
-  const {
-    data: contactMessages,
-    isLoading: isContactsLoading,
-    error: contactsError,
-  } = useQuery<ContactMessage[]>({
-    queryKey: ["/api/contact-messages"],
-  });
+  const { data: staff, isLoading: isStaffLoading, error: staffError } =
+    useQuery<Staff[]>({
+      queryKey: ["/api/staff"],
+    });
+
+  const { data: projects, isLoading: isProjectsLoading, error: projectsError } =
+    useQuery<Project[]>({
+      queryKey: ["/api/projects"],
+    });
 
   const totalPrograms = programs?.length ?? 0;
   const totalBlogPosts = blogPosts?.length ?? 0;
-  const totalContacts = contactMessages?.length ?? 0;
+  const totalStaff = staff?.length ?? 0;
+  const totalProjects = projects?.length ?? 0;
 
   return (
     <AdminLayout>
       {/* Top stats cards */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
         <StatCard
           label="Programs"
           value={isProgramsLoading ? undefined : totalPrograms.toString()}
@@ -48,13 +62,18 @@ export default function AdminDashboard() {
           description="Stories & insights published"
         />
         <StatCard
-          label="Contact Messages"
-          value={isContactsLoading ? undefined : totalContacts.toString()}
-          description="Enquiries from website"
+          label="Team Members"
+          value={isStaffLoading ? undefined : totalStaff.toString()}
+          description="Active staff members"
+        />
+        <StatCard
+          label="Projects"
+          value={isProjectsLoading ? undefined : totalProjects.toString()}
+          description="Ongoing & completed projects"
         />
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-4 gap-6">
         {/* Recent Programs */}
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0">
@@ -142,14 +161,14 @@ export default function AdminDashboard() {
           </CardContent>
         </Card>
 
-        {/* Recent Contact Messages */}
+        {/* Recent Staff */}
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0">
             <CardTitle className="text-base font-semibold">
-              Latest Contact Messages
+              Recent Staff
             </CardTitle>
             <Button variant="ghost" size="sm" className="text-xs" asChild>
-              <Link href="/admin/contacts">
+              <Link href="/admin/staff">
                 <span className="flex items-center">
                   View all
                   <ArrowRight className="h-3 w-3 ml-1" />
@@ -158,29 +177,69 @@ export default function AdminDashboard() {
             </Button>
           </CardHeader>
           <CardContent>
-            {isContactsLoading ? (
+            {isStaffLoading ? (
               <SkeletonList />
-            ) : contactsError ? (
+            ) : staffError ? (
               <p className="text-sm text-destructive">
-                Failed to load contact messages.
+                Failed to load staff data.
               </p>
-            ) : contactMessages && contactMessages.length > 0 ? (
+            ) : staff && staff.length > 0 ? (
               <ul className="space-y-3">
-                {contactMessages.slice(0, 5).map((msg) => (
-                  <li
-                    key={msg.id}
-                    className="border-b last:border-none pb-2 last:pb-0 text-sm"
-                  >
-                    <p className="font-medium">{msg.name}</p>
+                {staff.slice(0, 5).map((member) => (
+                  <li key={member.id} className="text-sm">
+                    <p className="font-medium">{member.name}</p>
                     <p className="text-xs text-muted-foreground">
-                      {msg.email} · {msg.subject}
+                      {member.role}
                     </p>
                   </li>
                 ))}
               </ul>
             ) : (
               <p className="text-sm text-muted-foreground">
-                No contact messages yet.
+                No staff members yet.
+              </p>
+            )}
+          </CardContent>
+        </Card>
+
+        {/* Recent Projects */}
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0">
+            <CardTitle className="text-base font-semibold">
+              Recent Projects
+            </CardTitle>
+            <Button variant="ghost" size="sm" className="text-xs" asChild>
+              <Link href="/admin/projects">
+                <span className="flex items-center">
+                  View all
+                  <ArrowRight className="h-3 w-3 ml-1" />
+                </span>
+              </Link>
+            </Button>
+          </CardHeader>
+          <CardContent>
+            {isProjectsLoading ? (
+              <SkeletonList />
+            ) : projectsError ? (
+              <p className="text-sm text-destructive">
+                Failed to load projects.
+              </p>
+            ) : projects && projects.length > 0 ? (
+              <ul className="space-y-3">
+                {projects.slice(0, 5).map((project) => (
+                  <li key={project.id} className="text-sm">
+                    <p className="font-medium">{project.title}</p>
+                    {project.status && (
+                      <p className="text-xs text-muted-foreground capitalize">
+                        {project.status}
+                      </p>
+                    )}
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <p className="text-sm text-muted-foreground">
+                No projects created yet.
               </p>
             )}
           </CardContent>

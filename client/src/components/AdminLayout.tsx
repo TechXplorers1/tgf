@@ -7,7 +7,8 @@ import {
   Home,
   LayoutDashboard,
   BookOpen,
-  Mail,
+  Users,
+  Layers,
   LogOut,
 } from "lucide-react";
 import { useAuth } from "@/lib/auth";
@@ -20,7 +21,8 @@ const navItems = [
   { href: "/admin", label: "Dashboard", icon: LayoutDashboard },
   { href: "/admin/programs", label: "Programs", icon: BookOpen },
   { href: "/admin/blog", label: "Blog Posts", icon: BookOpen },
-  { href: "/admin/contacts", label: "Contact Messages", icon: Mail },
+  { href: "/admin/staff", label: "Staff", icon: Users },       // 👈 Added
+  { href: "/admin/projects", label: "Projects", icon: Layers }, // 👈 Added
   { href: "/", label: "Back to Site", icon: Home },
 ];
 
