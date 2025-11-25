@@ -30,7 +30,11 @@ type DonateSectionProps = {
 // Helper: load Razorpay script dynamically
 const loadRazorpayScript = (): Promise<boolean> => {
   return new Promise((resolve) => {
-    if (document.querySelector('script[src="https://checkout.razorpay.com/v1/checkout.js"]')) {
+    if (
+      document.querySelector(
+        'script[src="https://checkout.razorpay.com/v1/checkout.js"]'
+      )
+    ) {
       resolve(true);
       return;
     }
@@ -95,8 +99,20 @@ export function DonateSection({ initialProgram }: DonateSectionProps) {
       return;
     }
 
-    const keyId =
-      import.meta.env.VITE_RAZORPAY_KEY_ID || "rzp_test_xxxxxxxxxxxxx"; // <-- put your Razorpay TEST key here
+    // 🔥 Hard-coded TEST key (safe for testing)
+    const keyId = "rzp_test_Rjy0Hn2Ns66KiP";
+
+    if (!(window as any).Razorpay) {
+      toast({
+        title: "Payment SDK not available",
+        description: "Razorpay SDK not found on window. Please retry.",
+        variant: "destructive",
+      });
+      console.error("❌ window.Razorpay is not defined even after loading script.");
+      return;
+    }
+
+    console.log("🟢 Using Razorpay TEST key:", keyId);
 
     const options: any = {
       key: keyId,
