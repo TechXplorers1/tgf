@@ -6,6 +6,9 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { ChevronLeft, ChevronRight, ArrowRight } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import storyImage1 from "@assets/hero_indian_youth_education.png";
+import storyImage2 from "@assets/hero_indian_women_empowerment.png";
+import storyImage3 from "@assets/project_indian_literacy.png";
 
 type StoryCategory = "beneficiary" | "volunteer" | "partner";
 
@@ -27,35 +30,32 @@ type StoriesSectionProps = {
 
 const stories: Story[] = [
   {
-    id: "amina",
-    title: "Amina's Story",
+    id: "ananya",
+    title: "Ananya's Story",
     subtitle: "From Street to School",
     content:
-      "Amina, 10, once sold fruits on the roadside to support her family. Today, she attends school full-time through our education initiative. With access to meals, books, and guidance, she dreams of becoming a nurse to help her community.",
-    image:
-      "https://images.pexels.com/photos/1720187/pexels-photo-1720187.jpeg?auto=compress&cs=tinysrgb&w=800",
-    cta: "Support a Child Like Amina",
+      "Ananya, 10, once sold fruits on the roadside to support her family. Today, she attends school full-time through our education initiative. With access to meals, books, and guidance, she dreams of becoming a nurse to help her community.",
+    image: storyImage1,
+    cta: "Support a Child Like Ananya",
     category: "beneficiary",
   },
   {
-    id: "nandi",
-    title: "Nandi's Story",
+    id: "neha",
+    title: "Neha's Story",
     subtitle: "Sharing Skills, Changing Lives",
     content:
-      'Nandi, a young university student from South Africa, volunteers every weekend teaching girls basic digital skills and confidence-building. "I believe education is the real empowerment," she says.',
-    image:
-      "https://images.pexels.com/photos/1181524/pexels-photo-1181524.jpeg?auto=compress&cs=tinysrgb&w=800",
+      'Neha, a young university student from Mumbai, volunteers every weekend teaching girls basic digital skills and confidence-building. "I believe education is the real empowerment," she says.',
+    image: storyImage2,
     cta: "Join Our Volunteer Family",
     category: "volunteer",
   },
   {
-    id: "ubuntu-foundation",
-    title: "Ubuntu Foundation",
+    id: "seva-foundation",
+    title: "Seva Foundation",
     subtitle: "Empowering Through Partnership",
     content:
-      "In partnership with Ubuntu Foundation, we launched 50 digital learning hubs across Cameroon and Kenya, providing access to technology, training, and mentorship for over 3,500 children.",
-    image:
-      "https://images.pexels.com/photos/1181400/pexels-photo-1181400.jpeg?auto=compress&cs=tinysrgb&w=800",
+      "In partnership with Seva Foundation, we launched 50 digital learning hubs across Rajasthan and Bihar, providing access to technology, training, and mentorship for over 3,500 children.",
+    image: storyImage3,
     cta: "Partner With Us",
     category: "partner",
   },
@@ -211,11 +211,10 @@ export default function StoriesSection({
                 <button
                   key={story.id}
                   onClick={() => setCurrentIndex(index)}
-                  className={`h-2 rounded-full transition-all ${
-                    index === currentIndex
-                      ? "w-8 bg-primary"
-                      : "w-2 bg-muted-foreground/30"
-                  }`}
+                  className={`h-2 rounded-full transition-all ${index === currentIndex
+                    ? "w-8 bg-primary"
+                    : "w-2 bg-muted-foreground/30"
+                    }`}
                   aria-label={`Go to story ${index + 1}`}
                 />
               ))}

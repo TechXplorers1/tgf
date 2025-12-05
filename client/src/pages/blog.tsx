@@ -15,7 +15,7 @@ import { Clock, Calendar, ArrowRight } from "lucide-react";
 import type { BlogPost } from "@shared/schema";
 import { format } from "date-fns";
 
-import blogImage from "@assets/generated_images/Adult_literacy_project_showcase_171ac1d0.png";
+import blogImage from "@assets/project_indian_literacy.png";
 
 export default function Blog() {
   // --- SAMPLE DATA (type-safe with BlogPost) ---
@@ -154,11 +154,10 @@ The Youth Leadership Program trains students in:
                   <Badge
                     key={category}
                     variant={isActive ? "default" : "outline"}
-                    className={`px-4 py-2 cursor-pointer font-sans transition-all ${
-                      isActive
+                    className={`px-4 py-2 cursor-pointer font-sans transition-all ${isActive
                         ? "bg-primary text-primary-foreground"
                         : "hover:bg-primary/10"
-                    }`}
+                      }`}
                     onClick={() => setActiveCategory(category)}
                   >
                     {category}

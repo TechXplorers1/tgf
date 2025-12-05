@@ -40,9 +40,8 @@ export default function Header() {
 
   return (
     <motion.header
-      className={`fixed top-0 left-0 right-0 z-50 bg-white transition-all duration-300 ${
-        isScrolled ? "border-b shadow-sm py-5" : "py-7"
-      }`}
+      className={`fixed top-0 left-0 right-0 z-50 bg-white transition-all duration-300 ${isScrolled ? "border-b shadow-sm py-5" : "py-7"
+        }`}
       initial={{ y: -80 }}
       animate={{ y: 0 }}
       transition={{ type: "spring", stiffness: 120, damping: 15 }}
@@ -60,7 +59,7 @@ export default function Header() {
                 whileHover={{ scale: 1.05 }}
               >
                 <span className="text-primary-foreground font-heading font-bold text-3xl">
-                  C
+                  T
                 </span>
               </motion.div>
 
@@ -70,7 +69,7 @@ export default function Header() {
                 transition={{ delay: 0.2 }}
               >
                 <h1 className="font-heading font-bold text-3xl text-foreground">
-                  COMAGEND
+                  tgf
                 </h1>
                 <p className="text-sm text-muted-foreground hidden sm:block">
                   Empowering Communities
@@ -86,11 +85,10 @@ export default function Header() {
                 <motion.a
                   whileHover={{ scale: 1.08 }}
                   transition={{ type: "spring", stiffness: 200 }}
-                  className={`relative font-sans font-medium text-lg ${
-                    location === link.href
+                  className={`relative font-sans font-medium text-lg ${location === link.href
                       ? "text-primary"
                       : "text-foreground/70"
-                  } hover:text-primary`}
+                    } hover:text-primary`}
                 >
                   {link.label}
                   {location === link.href && (
@@ -152,11 +150,10 @@ export default function Header() {
                 <Link key={link.href} href={link.href}>
                   <motion.a
                     whileHover={{ x: 5 }}
-                    className={`block py-2 font-medium text-lg ${
-                      location === link.href
+                    className={`block py-2 font-medium text-lg ${location === link.href
                         ? "text-primary"
                         : "text-foreground"
-                    }`}
+                      }`}
                     onClick={() => setIsMobileMenuOpen(false)}
                   >
                     {link.label}

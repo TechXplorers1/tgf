@@ -70,7 +70,7 @@ export default function Home() {
     defaultValues: {
       name: "",
       email: "",
-      subject: "I’d like to volunteer with COMAGEND",
+      subject: "I’d like to volunteer with tgf",
       message: "",
     },
   });
@@ -101,7 +101,7 @@ export default function Home() {
     defaultValues: {
       name: "",
       email: "",
-      subject: "I’d like to partner with COMAGEND",
+      subject: "I’d like to partner with tgf",
       message: "",
     },
   });
@@ -129,7 +129,7 @@ export default function Home() {
       icon: HandHeart,
       title: "Support Our Cause",
       description:
-        "Your contribution helps us create lasting change in communities across Africa.",
+        "Your contribution helps us create lasting change in communities across India.",
       cta: "Make a Difference",
     },
     {
@@ -143,7 +143,7 @@ export default function Home() {
       icon: Handshake,
       title: "Partner With Us",
       description:
-        "Collaborate with COMAGEND to amplify our impact and reach more communities.",
+        "Collaborate with tgf to amplify our impact and reach more communities.",
       cta: "Become a Partner",
     },
   ];
@@ -209,8 +209,8 @@ export default function Home() {
                         card.title === "Support Our Cause"
                           ? setIsDonationDialogOpen(true)
                           : card.title === "Volunteer With Us"
-                          ? setIsVolunteerDialogOpen(true)
-                          : setIsPartnerDialogOpen(true)
+                            ? setIsVolunteerDialogOpen(true)
+                            : setIsPartnerDialogOpen(true)
                       }
                     >
                       {card.cta}
@@ -257,7 +257,7 @@ export default function Home() {
                     <FormItem>
                       <FormLabel>Name</FormLabel>
                       <FormControl>
-                        <Input placeholder="Enter full name" {...field} />
+                        <Input placeholder="Amit Kumar" {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -273,7 +273,7 @@ export default function Home() {
                       <FormControl>
                         <Input
                           type="email"
-                          placeholder="you@example.com"
+                          placeholder="amit@example.com"
                           {...field}
                         />
                       </FormControl>
@@ -345,7 +345,7 @@ export default function Home() {
                     <FormItem>
                       <FormLabel>Contact Name</FormLabel>
                       <FormControl>
-                        <Input placeholder="Enter name" {...field} />
+                        <Input placeholder="Amit Kumar" {...field} />
                       </FormControl>
                     </FormItem>
                   )}
@@ -358,7 +358,7 @@ export default function Home() {
                     <FormItem>
                       <FormLabel>Work Email</FormLabel>
                       <FormControl>
-                        <Input placeholder="you@company.com" {...field} />
+                        <Input placeholder="amit@company.com" {...field} />
                       </FormControl>
                     </FormItem>
                   )}

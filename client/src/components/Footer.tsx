@@ -79,7 +79,7 @@ export default function Footer() {
       return (
         <>
           <p>
-            We value your privacy. This Privacy Policy explains how COMAGEND
+            We value your privacy. This Privacy Policy explains how tgf
             collects, uses, and protects your personal information when you
             interact with our website, programs, and services.
           </p>
@@ -95,7 +95,7 @@ export default function Footer() {
           </p>
           <p>
             If you wish to update or delete your personal information, you can
-            contact us at <span className="font-medium">info@comagend.org</span>.
+            contact us at <span className="font-medium">inquiries@techxplorers.in</span>.
           </p>
         </>
       );
@@ -105,7 +105,7 @@ export default function Footer() {
       return (
         <>
           <p>
-            By accessing or using the COMAGEND website, you agree to these Terms
+            By accessing or using the tgf website, you agree to these Terms
             of Service. Please read them carefully before using our site.
           </p>
           <p>
@@ -114,13 +114,13 @@ export default function Footer() {
             to interfere with its operation, or use it for unlawful activities.
           </p>
           <p>
-            COMAGEND reserves the right to update or modify these terms at any
+            tgf reserves the right to update or modify these terms at any
             time. Continued use of the website after changes means you accept
             the updated terms.
           </p>
           <p>
             If you have any questions about these terms, please contact us at{" "}
-            <span className="font-medium">info@comagend.org</span>.
+            <span className="font-medium">inquiries@techxplorers.in</span>.
           </p>
         </>
       );
@@ -167,13 +167,13 @@ export default function Footer() {
             <div className="flex items-center space-x-2 mb-4">
               <div className="w-10 h-10 rounded-md bg-primary flex items-center justify-center">
                 <span className="text-primary-foreground font-heading font-bold text-xl">
-                  C
+                  T
                 </span>
               </div>
-              <h3 className="font-heading font-bold text-xl">COMAGEND</h3>
+              <h3 className="font-heading font-bold text-xl">tgf</h3>
             </div>
             <p className="text-muted-foreground mb-4 font-sans text-sm">
-              Community Advocacy for Gender and Development. Empowering African
+              Community Advocacy for Gender and Development. Empowering Indian
               communities through sustainable programs and initiatives.
             </p>
             <div className="flex space-x-3">
@@ -309,15 +309,15 @@ export default function Footer() {
             <div className="mt-4 space-y-2">
               <div className="flex items-center space-x-2 text-sm text-muted-foreground">
                 <Mail className="h-4 w-4" />
-                <span className="font-sans">info@comagend.org</span>
+                <span className="font-sans">inquiries@techxplorers.in</span>
               </div>
               <div className="flex items-center space-x-2 text-sm text-muted-foreground">
                 <Phone className="h-4 w-4" />
-                <span className="font-sans">+123 456 7890</span>
+                <span className="font-sans">+91 85220 90765</span>
               </div>
               <div className="flex items-start space-x-2 text-sm text-muted-foreground">
                 <MapPin className="h-4 w-4 mt-0.5" />
-                <span className="font-sans">Kampala, Uganda</span>
+                <span className="font-sans">Maruthi Nagar 3rd cross, Near Panda Mini mart, Anantapur, 515001</span>
               </div>
             </div>
           </motion.div>
@@ -326,7 +326,7 @@ export default function Footer() {
         <div className="border-t border-border pt-8">
           <div className="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
             <p className="text-sm text-muted-foreground font-sans">
-              © {new Date().getFullYear()} COMAGEND. All rights reserved.
+              © {new Date().getFullYear()} tgf. All rights reserved.
             </p>
             <div className="flex space-x-6">
               <button

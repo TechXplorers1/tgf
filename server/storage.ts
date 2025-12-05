@@ -45,10 +45,10 @@ export class MemStorage implements IStorage {
   }
 
   private seedData() {
-    const blogImage = "https://via.placeholder.com/800x600/5A381F/FFFFFF?text=Blog+Post";
-    const programImage1 = "https://via.placeholder.com/600x400/5A381F/FFFFFF?text=Women+Empowerment";
-    const programImage2 = "https://via.placeholder.com/600x400/5A381F/FFFFFF?text=Youth+Development";
-    const programImage3 = "https://via.placeholder.com/600x400/5A381F/FFFFFF?text=Health+Initiatives";
+    const blogImage = "https://via.placeholder.com/800x600/F48225/FFFFFF?text=Blog+Post";
+    const programImage1 = "https://via.placeholder.com/600x400/F48225/FFFFFF?text=Women+Empowerment";
+    const programImage2 = "https://via.placeholder.com/600x400/F48225/FFFFFF?text=Youth+Development";
+    const programImage3 = "https://via.placeholder.com/600x400/F48225/FFFFFF?text=Health+Initiatives";
 
     const blogPosts: BlogPost[] = [
       {
@@ -110,24 +110,24 @@ export class MemStorage implements IStorage {
     const stories: Story[] = [
       {
         id: randomUUID(),
-        name: "Sarah Nakato",
+        name: "Priya Sharma",
         role: "Program Beneficiary",
-        quote: "COMAGEND's women's empowerment program gave me the skills and confidence to start my own business. Today, I employ five women from my community.",
-        image: "https://via.placeholder.com/100x100/5A381F/FFFFFF?text=SN",
+        quote: "tgf's women's empowerment program gave me the skills and confidence to start my own business. Today, I employ five women from my community.",
+        image: "https://via.placeholder.com/100x100/F48225/FFFFFF?text=PS",
       },
       {
         id: randomUUID(),
-        name: "James Okello",
+        name: "Rahul Verma",
         role: "Community Leader",
         quote: "The youth development initiatives have transformed our community. Our young people now have hope and opportunities for a better future.",
-        image: "https://via.placeholder.com/100x100/5A381F/FFFFFF?text=JO",
+        image: "https://via.placeholder.com/100x100/F48225/FFFFFF?text=RV",
       },
       {
         id: randomUUID(),
-        name: "Grace Achieng",
+        name: "Anjali Gupta",
         role: "Health Volunteer",
-        quote: "Through COMAGEND's health programs, we've been able to reach remote villages and provide essential healthcare services to those who need it most.",
-        image: "https://via.placeholder.com/100x100/5A381F/FFFFFF?text=GA",
+        quote: "Through tgf's health programs, we've been able to reach remote villages and provide essential healthcare services to those who need it most.",
+        image: "https://via.placeholder.com/100x100/F48225/FFFFFF?text=AG",
       },
     ];
 

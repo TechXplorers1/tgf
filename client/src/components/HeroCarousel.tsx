@@ -15,9 +15,9 @@ import "swiper/css/navigation";
 import "swiper/css/pagination";
 import "swiper/css/effect-fade";
 
-import heroImage1 from "@assets/generated_images/Hero_community_empowerment_scene_3c5019a0.png";
-import heroImage2 from "@assets/generated_images/Gender_equality_workshop_hero_9359228b.png";
-import heroImage3 from "@assets/generated_images/Youth_education_hero_image_45adaae5.png";
+import heroImage1 from "@assets/hero_indian_women_empowerment.png";
+import heroImage2 from "@assets/hero_indian_community_health.png";
+import heroImage3 from "@assets/hero_indian_youth_education.png";
 
 // map DB program titles → hero images
 const programHeroImages: Record<string, string> = {
@@ -31,7 +31,7 @@ const fallbackSlides = [
   {
     title: "Empowering Communities",
     subtitle:
-      "Building a future of gender equality and sustainable development across Africa",
+      "Building a future of gender equality and sustainable development across India",
     image: heroImage1,
     programPath: "/programs", // 👈 go to programs page
   },
@@ -65,11 +65,11 @@ export default function HeroCarousel() {
   const programSlides =
     programs && programs.length > 0
       ? programs.slice(0, 3).map((program) => ({
-          title: program.title,
-          subtitle: program.description,
-          image: programHeroImages[program.title] ?? heroImage1,
-          programPath: `/programs/${program.id}`,
-        }))
+        title: program.title,
+        subtitle: program.description,
+        image: programHeroImages[program.title] ?? heroImage1,
+        programPath: `/programs/${program.id}`,
+      }))
       : null;
 
   const slidesToRender =

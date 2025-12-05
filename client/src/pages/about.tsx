@@ -13,9 +13,9 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
-import teamImage1 from "@assets/generated_images/Female_team_leader_portrait_ed33c58a.png";
-import teamImage2 from "@assets/generated_images/Male_team_member_portrait_e1b695c3.png";
-import teamImage3 from "@assets/generated_images/Young_female_educator_portrait_b9ab4a70.png";
+import teamImage1 from "@assets/team_indian_leader_female.png";
+import teamImage2 from "@assets/team_indian_member_male.png";
+import teamImage3 from "@assets/team_indian_educator_female.png";
 
 export default function About() {
   const values = [
@@ -47,29 +47,29 @@ export default function About() {
 
   const team = [
     {
-      name: "Dr. Amina Kabila",
+      name: "Dr. Aditi Rao",
       role: "Executive Director",
-      bio: "Leading COMAGEND with 15+ years of experience in community development and gender advocacy.",
+      bio: "Leading tgf with 15+ years of experience in community development and gender advocacy.",
       image: teamImage1,
-      email: "amina@comagend.org",
+      email: "aditi@tgf.org",
       linkedin: "#",
       twitter: "#",
     },
     {
-      name: "Robert Mensah",
+      name: "Rajesh Kumar",
       role: "Program Coordinator",
       bio: "Coordinating our youth development initiatives across multiple regions with proven impact.",
       image: teamImage2,
-      email: "robert@comagend.org",
+      email: "rajesh@tgf.org",
       linkedin: "#",
       twitter: "#",
     },
     {
-      name: "Grace Omondi",
+      name: "Sneha Patel",
       role: "Community Outreach Lead",
       bio: "Bridging the gap between our programs and the communities we serve with passion and dedication.",
       image: teamImage3,
-      email: "grace@comagend.org",
+      email: "sneha@tgf.org",
       linkedin: "#",
       twitter: "#",
     },
@@ -89,7 +89,7 @@ export default function About() {
               transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
             >
               <h1 className="font-heading font-bold text-4xl md:text-5xl lg:text-6xl mb-6">
-                About COMAGEND
+                About tgf
               </h1>
               <p className="font-sans text-lg md:text-xl text-muted-foreground">
                 Community Advocacy for Gender and Development

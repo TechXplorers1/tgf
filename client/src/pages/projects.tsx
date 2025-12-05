@@ -5,7 +5,7 @@ import { Card } from "@/components/ui/card";
 import { motion } from "framer-motion";
 import { Calendar, Users, Award } from "lucide-react";
 
-import projectImage from "@assets/generated_images/Adult_literacy_project_showcase_171ac1d0.png";
+import projectImage from "@assets/project_indian_literacy.png";
 
 export default function Projects() {
   const projects = [
@@ -126,15 +126,13 @@ export default function Projects() {
                 >
                   <Card className="overflow-hidden shadow-lg">
                     <div
-                      className={`grid grid-cols-1 lg:grid-cols-2 ${
-                        index % 2 === 1 ? "lg:grid-flow-col-dense" : ""
-                      }`}
+                      className={`grid grid-cols-1 lg:grid-cols-2 ${index % 2 === 1 ? "lg:grid-flow-col-dense" : ""
+                        }`}
                     >
                       {/* Full Image Section */}
                       <div
-                        className={`relative w-full lg:min-h-[450px] ${
-                          index % 2 === 1 ? "lg:col-start-2" : ""
-                        }`}
+                        className={`relative w-full lg:min-h-[450px] ${index % 2 === 1 ? "lg:col-start-2" : ""
+                          }`}
                       >
                         <img
                           src={project.image}
@@ -150,9 +148,8 @@ export default function Projects() {
 
                       {/* Content Section */}
                       <div
-                        className={`p-8 md:p-12 flex flex-col justify-center ${
-                          index % 2 === 1 ? "lg:col-start-1" : ""
-                        }`}
+                        className={`p-8 md:p-12 flex flex-col justify-center ${index % 2 === 1 ? "lg:col-start-1" : ""
+                          }`}
                       >
                         <h2 className="font-heading font-bold text-2xl md:text-3xl mb-4">
                           {project.title}

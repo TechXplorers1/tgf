@@ -43,7 +43,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
       {/* Sidebar */}
       <aside className="hidden md:flex md:w-64 flex-col border-r bg-background">
         <div className="px-6 py-4 border-b">
-          <h1 className="font-heading font-bold text-xl">COMAGEND Admin</h1>
+          <h1 className="font-heading font-bold text-xl">tgf Admin</h1>
           <p className="text-xs text-muted-foreground">Internal dashboard</p>
         </div>
 
@@ -55,10 +55,9 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
               <Link key={item.href} href={item.href}>
                 <button
                   className={`w-full flex items-center gap-2 px-3 py-2 rounded-md text-sm font-sans text-left transition 
-                    ${
-                      isActive
-                        ? "bg-primary text-primary-foreground"
-                        : "text-foreground/80 hover:bg-muted"
+                    ${isActive
+                      ? "bg-primary text-primary-foreground"
+                      : "text-foreground/80 hover:bg-muted"
                     }`}
                 >
                   <Icon className="h-4 w-4" />

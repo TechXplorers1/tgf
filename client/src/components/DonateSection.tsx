@@ -118,7 +118,7 @@ export function DonateSection({ initialProgram }: DonateSectionProps) {
       key: keyId,
       amount: amount * 100, // amount in paise
       currency: "INR",
-      name: "COMAGEND",
+      name: "tgf",
       description: "Donation",
       handler: function (response: any) {
         // This is called after successful payment in TEST mode
@@ -319,7 +319,7 @@ export function DonateSection({ initialProgram }: DonateSectionProps) {
                       <FormControl>
                         <Input
                           {...field}
-                          placeholder="Your name"
+                          placeholder="Amit Kumar"
                           data-testid="input-donor-name"
                         />
                       </FormControl>
@@ -339,7 +339,7 @@ export function DonateSection({ initialProgram }: DonateSectionProps) {
                         <Input
                           {...field}
                           type="email"
-                          placeholder="your.email@example.com"
+                          placeholder="amit.kumar@example.com"
                           data-testid="input-donor-email"
                         />
                       </FormControl>

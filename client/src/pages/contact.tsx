@@ -70,26 +70,26 @@ export default function Contact() {
     {
       icon: Mail,
       title: "Email",
-      content: "info@comagend.org",
+      content: "inquiries@techxplorers.in",
       description: "Send us an email anytime",
     },
     {
       icon: Phone,
       title: "Phone",
-      content: "+256 123 456 789",
-      description: "Mon–Fri from 8am to 5pm EAT",
+      content: "+91 85220 90765",
+      description: "Mon–Fri from 9am to 6pm IST",
     },
     {
       icon: MapPin,
       title: "Office",
-      content: "Kampala, Uganda",
-      description: "Plot 123, Main Street, Kampala",
+      content: "Anantapur, 515001",
+      description: "Maruthi Nagar 3rd cross, Near Panda Mini mart",
     },
     {
       icon: Clock,
       title: "Working Hours",
       content: "Monday – Friday",
-      description: "8:00 AM – 5:00 PM EAT",
+      description: "9:00 AM – 6:00 PM IST",
     },
   ];
 
@@ -143,7 +143,7 @@ export default function Contact() {
                         <FormItem>
                           <FormLabel>Your Name</FormLabel>
                           <FormControl>
-                            <Input placeholder="John Doe" {...field} />
+                            <Input placeholder="Amit Kumar" {...field} />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -157,7 +157,7 @@ export default function Contact() {
                         <FormItem>
                           <FormLabel>Email Address</FormLabel>
                           <FormControl>
-                            <Input type="email" placeholder="john@example.com" {...field} />
+                            <Input type="email" placeholder="amit@example.com" {...field} />
                           </FormControl>
                           <FormMessage />
                         </FormItem>

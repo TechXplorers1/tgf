@@ -63,16 +63,16 @@ const AdminLogin = () => {
                     <div className="h-16 w-16 rounded-2xl bg-[#5A3A2C]/90 flex items-center justify-center shadow-lg shadow-black/40">
                       <img
                         src="/favicon.png"
-                        alt="COMAGEND Logo"
+                        alt="tgf Logo"
                         className="h-12 w-12 object-contain"
                       />
                     </div>
                     <div>
                       <p className="text-[11px] uppercase tracking-[0.24em] text-[#D0B9A6]/90">
-                        Comagend • NGO Platform
+                        tgf • NGO Platform
                       </p>
                       <h1 className="text-3xl lg:text-4xl font-semibold">
-                        COMAGEND Admin
+                        tgf Admin
                       </h1>
                     </div>
                   </div>
@@ -115,12 +115,12 @@ const AdminLogin = () => {
                 {/* Header */}
                 <div className="mb-6 text-center">
                   <p className="text-[11px] uppercase tracking-[0.22em] text-[#8B6E56]">
-                    COMAGEND • Admin Console
+                    tgf • Admin Console
                   </p>
                   <h2 className="text-2xl font-semibold mt-2">Admin Login</h2>
                   <p className="text-xs text-gray-500 mt-1">
                     Use your authorized administrator credentials to access the
-                    COMAGEND dashboard.
+                    tgf dashboard.
                   </p>
                 </div>
 
@@ -212,7 +212,7 @@ const AdminLogin = () => {
               </div>
 
               <p className="mt-5 text-[10px] text-center text-[#D0B9A6]/80">
-                © {new Date().getFullYear()} COMAGEND. Secure internal admin
+                © {new Date().getFullYear()} tgf. Secure internal admin
                 environment.
               </p>
             </div>

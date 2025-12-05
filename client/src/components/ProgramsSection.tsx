@@ -13,14 +13,11 @@ import {
 } from "lucide-react";
 
 // African cultural images
-const literacyImage =
-  "https://images.pexels.com/photos/1181401/pexels-photo-1181401.jpeg?auto=compress&cs=tinysrgb&w=800";
-
-const youthImage =
-  "https://images.pexels.com/photos/3184306/pexels-photo-3184306.jpeg?auto=compress&cs=tinysrgb&w=800";
-
-const healthImage =
-  "https://images.pexels.com/photos/6129201/pexels-photo-6129201.jpeg?auto=compress&cs=tinysrgb&w=800";
+import literacyImage from "@assets/project_indian_literacy.png";
+import youthImage from "@assets/hero_indian_youth_education.png";
+import healthImage from "@assets/hero_indian_community_health.png";
+import empowermentImage from "@assets/hero_indian_women_empowerment.png";
+import educatorImage from "@assets/team_indian_educator_female.png";
 
 export default function ProgramsSection() {
   const projects = [
@@ -75,9 +72,9 @@ export default function ProgramsSection() {
     literacyImage,
     youthImage,
     healthImage,
-    "https://images.pexels.com/photos/3810757/pexels-photo-3810757.jpeg?auto=compress&cs=tinysrgb&w=800",
+    empowermentImage,
+    educatorImage,
     literacyImage,
-    "https://images.pexels.com/photos/3810757/pexels-photo-3810757.jpeg?auto=compress&cs=tinysrgb&w=800",
   ];
 
   const [selectedImageIndex, setSelectedImageIndex] = useState<number | null>(
@@ -167,9 +164,8 @@ export default function ProgramsSection() {
                 <Card className="overflow-hidden shadow-md hover:shadow-xl transition-shadow duration-300">
                   {/* flex so image and content share the same card height */}
                   <div
-                    className={`flex flex-col lg:flex-row ${
-                      index % 2 === 1 ? "lg:flex-row-reverse" : ""
-                    }`}
+                    className={`flex flex-col lg:flex-row ${index % 2 === 1 ? "lg:flex-row-reverse" : ""
+                      }`}
                   >
                     {/* Image section */}
                     <div className="relative w-full lg:w-1/2">

@@ -165,7 +165,7 @@ export default function ProgramDetail({ id }: ProgramDetailProps) {
     defaultValues: {
       name: "",
       email: "",
-      subject: `I’d like to volunteer for ${program?.title || "COMAGEND"}`,
+      subject: `I’d like to volunteer for ${program?.title || "tgf"}`,
       message: "",
     },
   });
@@ -174,7 +174,7 @@ export default function ProgramDetail({ id }: ProgramDetailProps) {
   useEffect(() => {
     volunteerForm.setValue(
       "subject",
-      `I’d like to volunteer for ${program?.title || "COMAGEND"}`
+      `I’d like to volunteer for ${program?.title || "tgf"}`
     );
   }, [program?.title, volunteerForm]);
 
@@ -191,7 +191,7 @@ export default function ProgramDetail({ id }: ProgramDetailProps) {
       volunteerForm.reset({
         name: "",
         email: "",
-        subject: `I’d like to volunteer for ${program?.title || "COMAGEND"}`,
+        subject: `I’d like to volunteer for ${program?.title || "tgf"}`,
         message: "",
       });
       setTimeout(() => setVolunteerSuccess(false), 3000);
@@ -392,7 +392,7 @@ export default function ProgramDetail({ id }: ProgramDetailProps) {
                   <FormItem>
                     <FormLabel>Full Name</FormLabel>
                     <FormControl>
-                      <Input {...field} placeholder="Your name" />
+                      <Input {...field} placeholder="Amit Kumar" />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -409,7 +409,7 @@ export default function ProgramDetail({ id }: ProgramDetailProps) {
                       <Input
                         {...field}
                         type="email"
-                        placeholder="you@example.com"
+                        placeholder="amit@example.com"
                       />
                     </FormControl>
                     <FormMessage />
