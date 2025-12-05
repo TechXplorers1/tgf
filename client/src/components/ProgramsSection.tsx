@@ -18,6 +18,9 @@ import youthImage from "@assets/hero_indian_youth_education.png";
 import healthImage from "@assets/hero_indian_community_health.png";
 import empowermentImage from "@assets/hero_indian_women_empowerment.png";
 import educatorImage from "@assets/team_indian_educator_female.png";
+import differentlyAbledImage from "@assets/program_differently_abled.png";
+import ruralDevImage from "@assets/program_rural_development.png";
+import youthEmpowermentImage from "@assets/program_youth_empowerment.png";
 
 export default function ProgramsSection() {
   const projects = [
@@ -66,6 +69,48 @@ export default function ProgramsSection() {
           "40% reduction in preventable diseases, 150 trained health volunteers",
       },
     },
+    {
+      id: 4,
+      title: "Differently Abled Training & Placement",
+      category: "Vocational Training",
+      description:
+        "Specialized vocational training and job placement support for differently abled individuals, fostering independence and inclusive employment opportunities.",
+      image: differentlyAbledImage,
+      stats: {
+        duration: "2023 - Present",
+        beneficiaries: "500+ individuals",
+        partners: "Inclusive Corporations, Skill India",
+        outcomes: "300+ placed in permanent jobs, 90% retention rate",
+      },
+    },
+    {
+      id: 5,
+      title: "Rural Development Initiative",
+      category: "Community Development",
+      description:
+        "Holistic rural development focusing on infrastructure, sustainable agriculture, and access to clean water and energy in remote villages.",
+      image: ruralDevImage,
+      stats: {
+        duration: "2019 - Present",
+        beneficiaries: "10,000+ villagers",
+        partners: "Gram Panchayats, Rural Banks",
+        outcomes: "50 villages impacted, 100% electrification in target areas",
+      },
+    },
+    {
+      id: 6,
+      title: "Youth Empowerment & Skill Building",
+      category: "Youth Development",
+      description:
+        "Empowering youth with 21st-century skills, career counseling, and mentorship to navigate the modern job market and become community leaders.",
+      image: youthEmpowermentImage,
+      stats: {
+        duration: "2022 - Present",
+        beneficiaries: "3,000+ youth",
+        partners: "Tech Companies, Youth Centers",
+        outcomes: "1,200+ internships secured, 50+ youth-led startups",
+      },
+    },
   ];
 
   const galleryImages = [
@@ -73,7 +118,11 @@ export default function ProgramsSection() {
     youthImage,
     healthImage,
     empowermentImage,
+    empowermentImage,
     educatorImage,
+    differentlyAbledImage,
+    ruralDevImage,
+    youthEmpowermentImage,
     literacyImage,
   ];
 
