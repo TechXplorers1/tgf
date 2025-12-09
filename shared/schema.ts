@@ -9,6 +9,24 @@ export const programs = pgTable("programs", {
   description: text("description").notNull(),
   image: text("image").notNull(),
   category: text("category").notNull(),
+  // Extended details
+  duration: text("duration"),
+  beneficiaries: text("beneficiaries"),
+  partners: text("partners"),
+  outcomes: text("outcomes"),
+});
+
+export const siteConfig = pgTable("site_config", {
+  id: integer("id").primaryKey().default(1), // Single row table
+  email: text("email").notNull().default("inquiries@techxplorers.in"),
+  phone: text("phone").notNull().default("+91 85220 90765"),
+  address: text("address").notNull().default("Maruthi Nagar 3rd cross, Near Panda Mini mart, Anantapur, 515001"),
+  workingHours: text("working_hours").notNull().default("Monday – Friday, 9:00 AM – 6:00 PM IST"),
+  // Contact Page Headings
+  contactHeroTitle: text("contact_hero_title").notNull().default("Get in Touch"),
+  contactHeroSubtitle: text("contact_hero_subtitle").notNull().default("Have questions or want to get involved? We'd love to hear from you."),
+  contactFormTitle: text("contact_form_title").notNull().default("Send us a message"),
+  contactFormSubtitle: text("contact_form_subtitle").notNull().default("Fill out the form below and we'll get back to you within 24 hours."),
 });
 
 export const stories = pgTable("stories", {
@@ -142,6 +160,7 @@ export const insertHeroSlideSchema = createInsertSchema(heroSlides).omit({ id: t
 export const insertImpactStatSchema = createInsertSchema(impactStats).omit({ id: true });
 export const insertPartnerSchema = createInsertSchema(partners).omit({ id: true });
 export const insertProjectSchema = createInsertSchema(projects).omit({ id: true });
+export const insertSiteConfigSchema = createInsertSchema(siteConfig);
 
 /* -------------------- TYPES -------------------- */
 
@@ -177,3 +196,6 @@ export type InsertPartner = z.infer<typeof insertPartnerSchema>;
 
 export type Project = typeof projects.$inferSelect;
 export type InsertProject = z.infer<typeof insertProjectSchema>;
+
+export type SiteConfig = typeof siteConfig.$inferSelect;
+export type InsertSiteConfig = z.infer<typeof insertSiteConfigSchema>;

@@ -71,7 +71,7 @@ export default function Header() {
                   TGF
                 </h1>
                 <p className="text-sm text-muted-foreground hidden lg:block">
-                  The Global Foundation
+                  Techxplorers Global Foundation
                 </p>
               </motion.div>
             </motion.div>

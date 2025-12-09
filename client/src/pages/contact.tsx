@@ -21,13 +21,19 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
+
+import { type SiteConfig } from "@shared/schema";
 
 export default function Contact() {
   const [isSuccess, setIsSuccess] = useState(false);
   const { toast } = useToast();
+
+  const { data: config } = useQuery<SiteConfig>({
+    queryKey: ["/api/site-config"],
+  });
 
   const form = useForm<InsertContactMessage>({
     resolver: zodResolver(insertContactMessageSchema),
@@ -70,25 +76,25 @@ export default function Contact() {
     {
       icon: Mail,
       title: "Email",
-      content: "inquiries@techxplorers.in",
+      content: config?.email || "inquiries@techxplorers.in",
       description: "Send us an email anytime",
     },
     {
       icon: Phone,
       title: "Phone",
-      content: "+91 85220 90765",
+      content: config?.phone || "+91 85220 90765",
       description: "Mon–Fri from 9am to 6pm IST",
     },
     {
       icon: MapPin,
       title: "Office",
-      content: "Anantapur, 515001",
+      content: config?.address || "Anantapur, 515001",
       description: "Maruthi Nagar 3rd cross, Near Panda Mini mart",
     },
     {
       icon: Clock,
       title: "Working Hours",
-      content: "Monday – Friday",
+      content: config?.workingHours || "Monday – Friday",
       description: "9:00 AM – 6:00 PM IST",
     },
   ];
@@ -108,11 +114,10 @@ export default function Contact() {
               transition={{ duration: 0.45 }}
             >
               <h1 className="font-heading font-bold text-4xl md:text-5xl lg:text-6xl mb-4">
-                Get in Touch
+                {config?.contactHeroTitle || "Get in Touch"}
               </h1>
               <p className="font-sans text-base md:text-lg text-muted-foreground max-w-2xl mx-auto">
-                Have questions or want to get involved? We'd love to hear from
-                you.
+                {config?.contactHeroSubtitle || "Have questions or want to get involved? We'd love to hear from you."}
               </p>
             </motion.div>
           </div>
@@ -129,9 +134,11 @@ export default function Contact() {
                 transition={{ duration: 0.45 }}
                 className="space-y-6"
               >
-                <h2 className="font-heading font-bold text-3xl mb-2">Send us a message</h2>
+                <h2 className="font-heading font-bold text-3xl mb-2">
+                  {config?.contactFormTitle || "Send us a message"}
+                </h2>
                 <p className="text-sm md:text-base text-muted-foreground mb-6">
-                  Fill out the form below and we'll get back to you within 24 hours.
+                  {config?.contactFormSubtitle || "Fill out the form below and we'll get back to you within 24 hours."}
                 </p>
 
                 <Form {...form}>

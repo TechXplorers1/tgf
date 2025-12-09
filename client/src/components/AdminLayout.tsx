@@ -22,7 +22,8 @@ const navItems = [
   { href: "/admin/programs", label: "Programs", icon: BookOpen },
   { href: "/admin/blog", label: "Blog Posts", icon: BookOpen },
   { href: "/admin/staff", label: "Staff", icon: Users },       // 👈 Added
-  { href: "/admin/projects", label: "Projects", icon: Layers }, // 👈 Added
+  { href: "/admin/projects", label: "Projects", icon: Layers },
+  { href: "/admin/settings", label: "Settings", icon: BookOpen }, // 👈 Added
 ];
 
 export default function AdminLayout({ children }: AdminLayoutProps) {

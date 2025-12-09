@@ -151,8 +151,20 @@ export default function ProgramDetail({ id }: ProgramDetailProps) {
   const donationProgram: InsertDonation["program"] =
     titleToDonationProgram[program?.title || ""] ?? "general";
 
+  // Use dynamic data if available, otherwise fall back to hardcoded
   const extra: ProgramExtra =
-    (program && programExtraByTitle[program.title]) || defaultExtra;
+    (program?.duration || program?.beneficiaries)
+      ? {
+        longDescription: program.description,
+        objectives: [], // Consider adding to DB later if needed
+        impactAreas: program.outcomes ? program.outcomes.split(',').map(s => s.trim()) : [],
+        stats: [
+          ...(program.duration ? [{ label: "Duration", value: program.duration }] : []),
+          ...(program.beneficiaries ? [{ label: "Beneficiaries", value: program.beneficiaries }] : []),
+          ...(program.partners ? [{ label: "Partners", value: program.partners }] : [])
+        ]
+      }
+      : (program && programExtraByTitle[program.title]) || defaultExtra;
 
   // Popup states
   const [isDonationDialogOpen, setIsDonationDialogOpen] = useState(false);
@@ -174,7 +186,7 @@ export default function ProgramDetail({ id }: ProgramDetailProps) {
   useEffect(() => {
     volunteerForm.setValue(
       "subject",
-      `I’d like to volunteer for ${program?.title || "tgf"}`
+      `I’d like to volunteer for ${program?.title || "TGF"}`
     );
   }, [program?.title, volunteerForm]);
 

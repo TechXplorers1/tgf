@@ -8,6 +8,8 @@ import {
   type Story,
   type InsertProgram,
   type InsertBlogPost,
+  type SiteConfig,
+  type InsertSiteConfig,
 } from "@shared/schema";
 import { randomUUID } from "crypto";
 
@@ -26,6 +28,8 @@ export interface IStorage {
   updateProgram(id: string, program: Partial<InsertProgram>): Promise<Program>;
   deleteProgram(id: string): Promise<void>;
   getAllStories(): Promise<Story[]>;
+  getSiteConfig(): Promise<SiteConfig>;
+  updateSiteConfig(config: Partial<InsertSiteConfig>): Promise<SiteConfig>;
 }
 
 export class MemStorage implements IStorage {
@@ -34,6 +38,7 @@ export class MemStorage implements IStorage {
   private blogPosts: Map<string, BlogPost>;
   private programs: Map<string, Program>;
   private stories: Map<string, Story>;
+  private siteConfig: SiteConfig;
 
   constructor() {
     this.newsletterSubscriptions = new Map();
@@ -41,6 +46,17 @@ export class MemStorage implements IStorage {
     this.blogPosts = new Map();
     this.programs = new Map();
     this.stories = new Map();
+    this.siteConfig = {
+      id: 1,
+      email: "inquiries@techxplorers.in",
+      phone: "+91 85220 90765",
+      address: "Maruthi Nagar 3rd cross, Near Panda Mini mart, Anantapur, 515001",
+      workingHours: "Monday – Friday, 9:00 AM – 6:00 PM IST",
+      contactHeroTitle: "Get in Touch",
+      contactHeroSubtitle: "Have questions or want to get involved? We'd love to hear from you.",
+      contactFormTitle: "Send us a message",
+      contactFormSubtitle: "Fill out the form below and we'll get back to you within 24 hours.",
+    };
     this.seedData();
   }
 
@@ -90,6 +106,10 @@ export class MemStorage implements IStorage {
         description: "Supporting women entrepreneurs through skills training, microfinance, and market access to build sustainable livelihoods.",
         image: programImage1,
         category: "Economic Development",
+        duration: "6 Months",
+        beneficiaries: "500 Women",
+        partners: "Local Gov, Women Co-ops",
+        outcomes: "Increased income, Business registrations",
       },
       {
         id: randomUUID(),
@@ -97,6 +117,10 @@ export class MemStorage implements IStorage {
         description: "Providing quality education, mentorship, and vocational training to empower the next generation of leaders.",
         image: programImage2,
         category: "Education",
+        duration: "1 Year",
+        beneficiaries: "1200 Students",
+        partners: "Schools, Tech Companies",
+        outcomes: "Higher pass rates, Job placements",
       },
       {
         id: randomUUID(),
@@ -104,6 +128,10 @@ export class MemStorage implements IStorage {
         description: "Improving access to healthcare services and health education in underserved communities across the region.",
         image: programImage3,
         category: "Health",
+        duration: "Ongoing",
+        beneficiaries: "50 Villages",
+        partners: "Health Dept, Red Cross",
+        outcomes: "Reduced mortality, Better hygiene",
       },
     ];
 
@@ -112,7 +140,7 @@ export class MemStorage implements IStorage {
         id: randomUUID(),
         name: "Priya Sharma",
         role: "Program Beneficiary",
-        quote: "tgf's women's empowerment program gave me the skills and confidence to start my own business. Today, I employ five women from my community.",
+        quote: "TGF's women's empowerment program gave me the skills and confidence to start my own business. Today, I employ five women from my community.",
         image: "https://via.placeholder.com/100x100/F48225/FFFFFF?text=PS",
       },
       {
@@ -126,7 +154,7 @@ export class MemStorage implements IStorage {
         id: randomUUID(),
         name: "Anjali Gupta",
         role: "Health Volunteer",
-        quote: "Through tgf's health programs, we've been able to reach remote villages and provide essential healthcare services to those who need it most.",
+        quote: "Through TGF's health programs, we've been able to reach remote villages and provide essential healthcare services to those who need it most.",
         image: "https://via.placeholder.com/100x100/F48225/FFFFFF?text=AG",
       },
     ];
@@ -134,6 +162,17 @@ export class MemStorage implements IStorage {
     blogPosts.forEach(post => this.blogPosts.set(post.id, post));
     programs.forEach(program => this.programs.set(program.id, program));
     stories.forEach(story => this.stories.set(story.id, story));
+  }
+
+  // ... (previous methods)
+
+  async getSiteConfig(): Promise<SiteConfig> {
+    return this.siteConfig;
+  }
+
+  async updateSiteConfig(config: Partial<InsertSiteConfig>): Promise<SiteConfig> {
+    this.siteConfig = { ...this.siteConfig, ...config };
+    return this.siteConfig;
   }
 
   async createNewsletterSubscription(

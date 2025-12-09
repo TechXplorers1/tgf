@@ -3,9 +3,10 @@ import { useState } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { insertProgramSchema, type InsertProgram } from "@shared/schema";
-import { queryClient } from "@/lib/queryClient";
-import { db, Program } from "@/lib/db";
+import { insertProgramSchema, type InsertProgram, type Program } from "@shared/schema";
+import { queryClient, apiRequest } from "@/lib/queryClient";
+// import { db, Program } from "@/lib/db"; // unused
+// We use Program from schema now
 import AdminLayout from "@/components/AdminLayout";
 import {
   Table,
@@ -42,17 +43,15 @@ export default function AdminPrograms() {
   const [editingProgram, setEditingProgram] = useState<Program | null>(null);
 
   const { data: programs, isLoading } = useQuery<Program[]>({
-    queryKey: ["local-programs"],
-    queryFn: db.getPrograms,
+    queryKey: ["/api/programs"],
   });
 
   const createMutation = useMutation({
     mutationFn: async (data: InsertProgram) => {
-      // Create with default stats handled in db
-      return await db.createProgram(data);
+      return await apiRequest("POST", "/api/programs", data);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["local-programs"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/programs"] });
       toast({ title: "Success", description: "Program created successfully" });
       setIsDialogOpen(false);
     },
@@ -67,10 +66,10 @@ export default function AdminPrograms() {
 
   const updateMutation = useMutation({
     mutationFn: async (program: Program) => {
-      return await db.updateProgram(program);
+      return await apiRequest("PATCH", `/api/programs/${program.id}`, program);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["local-programs"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/programs"] });
       toast({ title: "Success", description: "Program updated successfully" });
       setIsDialogOpen(false);
       setEditingProgram(null);
@@ -86,10 +85,10 @@ export default function AdminPrograms() {
 
   const deleteMutation = useMutation({
     mutationFn: async (id: number | string) => {
-      await db.deleteProgram(id);
+      await apiRequest("DELETE", `/api/programs/${id}`);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["local-programs"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/programs"] });
       toast({ title: "Success", description: "Program deleted successfully" });
     },
     onError: (error: Error) => {
@@ -108,6 +107,10 @@ export default function AdminPrograms() {
       description: "",
       category: "",
       image: "",
+      duration: "",
+      beneficiaries: "",
+      partners: "",
+      outcomes: "",
     },
   });
 
@@ -124,7 +127,6 @@ export default function AdminPrograms() {
 
   const onSubmit = (data: InsertProgram) => {
     if (editingProgram) {
-      // Merge existing program data (id, stats) with form updates
       const updatedProgram: Program = {
         ...editingProgram,
         ...data,
@@ -142,6 +144,10 @@ export default function AdminPrograms() {
       description: program.description,
       category: program.category,
       image: program.image,
+      duration: program.duration || "",
+      beneficiaries: program.beneficiaries || "",
+      partners: program.partners || "",
+      outcomes: program.outcomes || "",
     });
     setIsDialogOpen(true);
   };
@@ -153,6 +159,10 @@ export default function AdminPrograms() {
       description: "",
       category: "",
       image: "",
+      duration: "",
+      beneficiaries: "",
+      partners: "",
+      outcomes: "",
     });
     setIsDialogOpen(true);
   };
@@ -167,7 +177,7 @@ export default function AdminPrograms() {
               <Plus className="mr-2 h-4 w-4" /> Add Program
             </Button>
           </DialogTrigger>
-          <DialogContent className="sm:max-w-[600px] max-h-[80vh] overflow-y-auto">
+          <DialogContent className="sm:max-w-[800px] max-h-[80vh] overflow-y-auto">
             <DialogHeader>
               <DialogTitle>
                 {editingProgram ? "Edit Program" : "Add New Program"}
@@ -175,32 +185,108 @@ export default function AdminPrograms() {
             </DialogHeader>
             <Form {...form}>
               <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <FormField
+                    control={form.control}
+                    name="title"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Title</FormLabel>
+                        <FormControl>
+                          <Input placeholder="Program title" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="category"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Category</FormLabel>
+                        <FormControl>
+                          <Input placeholder="e.g. Education, Health" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+
                 <FormField
                   control={form.control}
-                  name="title"
+                  name="description"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Title</FormLabel>
+                      <FormLabel>Overview / Description</FormLabel>
                       <FormControl>
-                        <Input placeholder="Program title" {...field} />
+                        <Textarea
+                          placeholder="Program details..."
+                          className="h-24"
+                          {...field}
+                        />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
                   )}
                 />
-                <FormField
-                  control={form.control}
-                  name="category"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Category</FormLabel>
-                      <FormControl>
-                        <Input placeholder="e.g. Education, Health" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <FormField
+                    control={form.control}
+                    name="duration"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Duration</FormLabel>
+                        <FormControl>
+                          <Input placeholder="e.g. 6 Months" value={field.value || ""} onChange={field.onChange} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="beneficiaries"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Beneficiaries</FormLabel>
+                        <FormControl>
+                          <Input placeholder="e.g. 500 Women" value={field.value || ""} onChange={field.onChange} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="partners"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Partners</FormLabel>
+                        <FormControl>
+                          <Input placeholder="e.g. Local Gov" value={field.value || ""} onChange={field.onChange} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="outcomes"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Key Outcomes</FormLabel>
+                        <FormControl>
+                          <Input placeholder="e.g. Increased income" value={field.value || ""} onChange={field.onChange} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+
                 <FormField
                   control={form.control}
                   name="image"
@@ -218,7 +304,7 @@ export default function AdminPrograms() {
                             <img
                               src={field.value}
                               alt="Preview"
-                              className="w-full h-32 object-cover rounded-md mt-2"
+                              className="w-full h-48 object-cover rounded-md mt-2"
                             />
                           )}
                         </div>
@@ -227,23 +313,7 @@ export default function AdminPrograms() {
                     </FormItem>
                   )}
                 />
-                <FormField
-                  control={form.control}
-                  name="description"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Description</FormLabel>
-                      <FormControl>
-                        <Textarea
-                          placeholder="Program description..."
-                          className="h-20"
-                          {...field}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
+
                 <Button
                   type="submit"
                   className="w-full"

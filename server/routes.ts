@@ -5,7 +5,8 @@ import {
   insertNewsletterSubscriptionSchema,
   insertContactMessageSchema,
   insertProgramSchema,
-  insertBlogPostSchema
+  insertBlogPostSchema,
+  insertSiteConfigSchema,
 } from "@shared/schema";
 import { fromError } from "zod-validation-error";
 
@@ -157,6 +158,30 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(204).send();
     } catch (error: any) {
       res.status(500).json({ message: error.message || "Failed to delete message" });
+    }
+  });
+
+  // Site Config
+  app.get("/api/site-config", async (_req, res) => {
+    try {
+      const config = await storage.getSiteConfig();
+      res.json(config);
+    } catch (error: any) {
+      res.status(500).json({ message: error.message || "Failed to fetch site config" });
+    }
+  });
+
+  app.patch("/api/site-config", async (req, res) => {
+    try {
+      const validatedData = insertSiteConfigSchema.partial().parse(req.body);
+      const config = await storage.updateSiteConfig(validatedData);
+      res.json(config);
+    } catch (error: any) {
+      if (error.name === "ZodError") {
+        const validationError = fromError(error);
+        return res.status(400).json({ message: validationError.message });
+      }
+      res.status(500).json({ message: error.message || "Failed to update site config" });
     }
   });
 

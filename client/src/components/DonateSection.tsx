@@ -118,7 +118,7 @@ export function DonateSection({ initialProgram }: DonateSectionProps) {
       key: keyId,
       amount: amount * 100, // amount in paise
       currency: "INR",
-      name: "tgf",
+      name: "TGF",
       description: "Donation",
       handler: function (response: any) {
         // This is called after successful payment in TEST mode
