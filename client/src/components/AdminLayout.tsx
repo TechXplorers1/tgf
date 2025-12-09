@@ -23,7 +23,6 @@ const navItems = [
   { href: "/admin/blog", label: "Blog Posts", icon: BookOpen },
   { href: "/admin/staff", label: "Staff", icon: Users },       // 👈 Added
   { href: "/admin/projects", label: "Projects", icon: Layers }, // 👈 Added
-  { href: "/", label: "Back to Site", icon: Home },
 ];
 
 export default function AdminLayout({ children }: AdminLayoutProps) {
@@ -43,7 +42,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
       {/* Sidebar */}
       <aside className="hidden md:flex md:w-64 flex-col border-r bg-background">
         <div className="px-6 py-4 border-b">
-          <h1 className="font-heading font-bold text-xl">tgf Admin</h1>
+          <h1 className="font-heading font-bold text-xl">TGF Admin</h1>
           <p className="text-xs text-muted-foreground">Internal dashboard</p>
         </div>
 
