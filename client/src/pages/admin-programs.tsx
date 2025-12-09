@@ -1,11 +1,11 @@
-// client/src/pages/admin-programs.tsx
 
 import { useState } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { insertProgramSchema, type Program, type InsertProgram } from "@shared/schema";
-import { apiRequest, queryClient } from "@/lib/queryClient";
+import { insertProgramSchema, type InsertProgram } from "@shared/schema";
+import { queryClient } from "@/lib/queryClient";
+import { db, Program } from "@/lib/db";
 import AdminLayout from "@/components/AdminLayout";
 import {
   Table,
@@ -42,16 +42,17 @@ export default function AdminPrograms() {
   const [editingProgram, setEditingProgram] = useState<Program | null>(null);
 
   const { data: programs, isLoading } = useQuery<Program[]>({
-    queryKey: ["/api/programs"],
+    queryKey: ["local-programs"],
+    queryFn: db.getPrograms,
   });
 
   const createMutation = useMutation({
     mutationFn: async (data: InsertProgram) => {
-      const res = await apiRequest("POST", "/api/programs", data);
-      return res.json();
+      // Create with default stats handled in db
+      return await db.createProgram(data);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/programs"] });
+      queryClient.invalidateQueries({ queryKey: ["local-programs"] });
       toast({ title: "Success", description: "Program created successfully" });
       setIsDialogOpen(false);
     },
@@ -65,12 +66,11 @@ export default function AdminPrograms() {
   });
 
   const updateMutation = useMutation({
-    mutationFn: async ({ id, data }: { id: string; data: Partial<InsertProgram> }) => {
-      const res = await apiRequest("PATCH", `/api/programs/${id}`, data);
-      return res.json();
+    mutationFn: async (program: Program) => {
+      return await db.updateProgram(program);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/programs"] });
+      queryClient.invalidateQueries({ queryKey: ["local-programs"] });
       toast({ title: "Success", description: "Program updated successfully" });
       setIsDialogOpen(false);
       setEditingProgram(null);
@@ -85,11 +85,11 @@ export default function AdminPrograms() {
   });
 
   const deleteMutation = useMutation({
-    mutationFn: async (id: string) => {
-      await apiRequest("DELETE", `/api/programs/${id}`);
+    mutationFn: async (id: number | string) => {
+      await db.deleteProgram(id);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/programs"] });
+      queryClient.invalidateQueries({ queryKey: ["local-programs"] });
       toast({ title: "Success", description: "Program deleted successfully" });
     },
     onError: (error: Error) => {
@@ -111,9 +111,25 @@ export default function AdminPrograms() {
     },
   });
 
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        form.setValue("image", reader.result as string);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
   const onSubmit = (data: InsertProgram) => {
     if (editingProgram) {
-      updateMutation.mutate({ id: editingProgram.id, data });
+      // Merge existing program data (id, stats) with form updates
+      const updatedProgram: Program = {
+        ...editingProgram,
+        ...data,
+      };
+      updateMutation.mutate(updatedProgram);
     } else {
       createMutation.mutate(data);
     }
@@ -151,7 +167,7 @@ export default function AdminPrograms() {
               <Plus className="mr-2 h-4 w-4" /> Add Program
             </Button>
           </DialogTrigger>
-          <DialogContent className="sm:max-w-[500px]">
+          <DialogContent className="sm:max-w-[600px] max-h-[80vh] overflow-y-auto">
             <DialogHeader>
               <DialogTitle>
                 {editingProgram ? "Edit Program" : "Add New Program"}
@@ -190,9 +206,22 @@ export default function AdminPrograms() {
                   name="image"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Image URL</FormLabel>
+                      <FormLabel>Image</FormLabel>
                       <FormControl>
-                        <Input placeholder="https://..." {...field} />
+                        <div className="space-y-2">
+                          <Input
+                            type="file"
+                            accept="image/*"
+                            onChange={handleImageChange}
+                          />
+                          {field.value && (
+                            <img
+                              src={field.value}
+                              alt="Preview"
+                              className="w-full h-32 object-cover rounded-md mt-2"
+                            />
+                          )}
+                        </div>
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -207,7 +236,7 @@ export default function AdminPrograms() {
                       <FormControl>
                         <Textarea
                           placeholder="Program description..."
-                          className="h-32"
+                          className="h-20"
                           {...field}
                         />
                       </FormControl>

@@ -1,3 +1,5 @@
+import { useQuery } from "@tanstack/react-query";
+import { db, Staff } from "@/lib/db";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { Card } from "@/components/ui/card";
@@ -13,11 +15,12 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
-import teamImage1 from "@assets/team_indian_leader_female.png";
-import teamImage2 from "@assets/team_indian_member_male.png";
-import teamImage3 from "@assets/team_indian_educator_female.png";
-
 export default function About() {
+  const { data: team = [] } = useQuery<Staff[]>({
+    queryKey: ["local-staff"],
+    queryFn: db.getStaff,
+  });
+
   const values = [
     {
       icon: Target,
@@ -42,36 +45,6 @@ export default function About() {
       title: "Collaboration",
       description:
         "We partner with local communities, organizations, and stakeholders to maximize impact.",
-    },
-  ];
-
-  const team = [
-    {
-      name: "Dr. Aditi Rao",
-      role: "Executive Director",
-      bio: "Leading tgf with 15+ years of experience in community development and gender advocacy.",
-      image: teamImage1,
-      email: "aditi@tgf.org",
-      linkedin: "#",
-      twitter: "#",
-    },
-    {
-      name: "Rajesh Kumar",
-      role: "Program Coordinator",
-      bio: "Coordinating our youth development initiatives across multiple regions with proven impact.",
-      image: teamImage2,
-      email: "rajesh@tgf.org",
-      linkedin: "#",
-      twitter: "#",
-    },
-    {
-      name: "Sneha Patel",
-      role: "Community Outreach Lead",
-      bio: "Bridging the gap between our programs and the communities we serve with passion and dedication.",
-      image: teamImage3,
-      email: "sneha@tgf.org",
-      linkedin: "#",
-      twitter: "#",
     },
   ];
 

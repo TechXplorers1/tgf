@@ -12,7 +12,9 @@ import {
   ChevronRight,
 } from "lucide-react";
 
-// African cultural images
+import { db, Program } from "@/lib/db";
+
+// Indian cultural images (Still needed for fallback or initial rendering if we used them in db.ts imports)
 import literacyImage from "@assets/project_indian_literacy.png";
 import youthImage from "@assets/hero_indian_youth_education.png";
 import healthImage from "@assets/hero_indian_community_health.png";
@@ -23,108 +25,35 @@ import ruralDevImage from "@assets/program_rural_development.png";
 import youthEmpowermentImage from "@assets/program_youth_empowerment.png";
 
 export default function ProgramsSection() {
-  const projects = [
-    {
-      id: 1,
-      title: "Women's Literacy & Skills Development",
-      category: "Education",
-      description:
-        "A comprehensive program providing adult literacy classes and vocational skills training to women in rural communities, enabling economic independence and community leadership.",
-      image: literacyImage,
-      stats: {
-        duration: "2022 - Present",
-        beneficiaries: "5,000+ women",
-        partners: "Local Education Authority, Women's Cooperative",
-        outcomes:
-          "85% participants now literate, 60% started small businesses",
-      },
-    },
-    {
-      id: 2,
-      title: "Youth Leadership Academy",
-      category: "Youth Development",
-      description:
-        "An intensive leadership and entrepreneurship training program for young people aged 18-25, equipping them with skills to become change-makers in their communities.",
-      image: youthImage,
-      stats: {
-        duration: "2021 - Present",
-        beneficiaries: "2,500+ youth",
-        partners: "University Partnership, Business Incubators",
-        outcomes:
-          "200+ youth-led initiatives launched, 75% employment rate",
-      },
-    },
-    {
-      id: 3,
-      title: "Community Health Champions",
-      category: "Health",
-      description:
-        "Training community health volunteers to provide essential healthcare education and services in underserved areas, improving health outcomes and awareness.",
-      image: healthImage,
-      stats: {
-        duration: "2020 - Present",
-        beneficiaries: "25,000+ community members",
-        partners: "Ministry of Health, Local Clinics",
-        outcomes:
-          "40% reduction in preventable diseases, 150 trained health volunteers",
-      },
-    },
-    {
-      id: 4,
-      title: "Differently Abled Training & Placement",
-      category: "Vocational Training",
-      description:
-        "Specialized vocational training and job placement support for differently abled individuals, fostering independence and inclusive employment opportunities.",
-      image: differentlyAbledImage,
-      stats: {
-        duration: "2023 - Present",
-        beneficiaries: "500+ individuals",
-        partners: "Inclusive Corporations, Skill India",
-        outcomes: "300+ placed in permanent jobs, 90% retention rate",
-      },
-    },
-    {
-      id: 5,
-      title: "Rural Development Initiative",
-      category: "Community Development",
-      description:
-        "Holistic rural development focusing on infrastructure, sustainable agriculture, and access to clean water and energy in remote villages.",
-      image: ruralDevImage,
-      stats: {
-        duration: "2019 - Present",
-        beneficiaries: "10,000+ villagers",
-        partners: "Gram Panchayats, Rural Banks",
-        outcomes: "50 villages impacted, 100% electrification in target areas",
-      },
-    },
-    {
-      id: 6,
-      title: "Youth Empowerment & Skill Building",
-      category: "Youth Development",
-      description:
-        "Empowering youth with 21st-century skills, career counseling, and mentorship to navigate the modern job market and become community leaders.",
-      image: youthEmpowermentImage,
-      stats: {
-        duration: "2022 - Present",
-        beneficiaries: "3,000+ youth",
-        partners: "Tech Companies, Youth Centers",
-        outcomes: "1,200+ internships secured, 50+ youth-led startups",
-      },
-    },
-  ];
+  const [programs, setPrograms] = useState<Program[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  const galleryImages = [
-    literacyImage,
-    youthImage,
-    healthImage,
-    empowermentImage,
-    empowermentImage,
-    educatorImage,
-    differentlyAbledImage,
-    ruralDevImage,
-    youthEmpowermentImage,
-    literacyImage,
-  ];
+  useEffect(() => {
+    const fetchPrograms = async () => {
+      try {
+        const data = await db.getPrograms();
+        setPrograms(data);
+      } catch (error) {
+        console.error("Failed to fetch programs:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchPrograms();
+  }, []);
+
+  // Map programs to images for the gallery. 
+  // In a real app, images would be part of the program data URL.
+  // We'll use the images from the loaded programs.
+
+  const galleryImages = programs.map(p => p.image).filter(Boolean);
+
+  // If data is loading, we might want to show skeletons, but for now we'll just render empty or a loader.
+  // However, since we want to keep the UX smooth, we will wait for data.
+  // For the 'projects' variable below, we remap 'programs' to match the expected structure if needed, 
+  // but our DB 'Program' type matches the component's needs.
+
+
 
   const [selectedImageIndex, setSelectedImageIndex] = useState<number | null>(
     null
@@ -198,7 +127,7 @@ export default function ProgramsSection() {
       <section className="py-10 md:py-16 bg-background">
         <div className="container mx-auto px-4">
           <div className="space-y-16">
-            {projects.map((project, index) => (
+            {programs.map((project, index) => (
               <motion.div
                 key={project.id}
                 initial={{ opacity: 0, y: 30 }}

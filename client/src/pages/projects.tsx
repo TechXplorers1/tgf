@@ -5,63 +5,28 @@ import { Card } from "@/components/ui/card";
 import { motion } from "framer-motion";
 import { Calendar, Users, Award } from "lucide-react";
 
-import projectImage from "@assets/project_indian_literacy.png";
+import { useEffect } from "react";
+import { db, Project } from "@/lib/db";
 
 export default function Projects() {
-  const projects = [
-    {
-      id: 1,
-      title: "Women's Literacy & Skills Development",
-      category: "Education",
-      description:
-        "A comprehensive program providing adult literacy classes and vocational skills training to women in rural communities, enabling economic independence and community leadership.",
-      image: projectImage,
-      stats: {
-        duration: "2022 - Present",
-        beneficiaries: "5,000+ women",
-        partners: "Local Education Authority, Women's Cooperative",
-        outcomes: "85% participants now literate, 60% started small businesses",
-      },
-    },
-    {
-      id: 2,
-      title: "Youth Leadership Academy",
-      category: "Youth Development",
-      description:
-        "An intensive leadership and entrepreneurship training program for youth aged 18–25, building the next generation of community leaders.",
-      image: projectImage,
-      stats: {
-        duration: "2021 - Present",
-        beneficiaries: "2,500+ youth",
-        partners: "University Partnership, Business Incubators",
-        outcomes: "200+ youth initiatives launched, 75% employment rate",
-      },
-    },
-    {
-      id: 3,
-      title: "Community Health Champions",
-      category: "Health",
-      description:
-        "Training community health volunteers to provide essential healthcare education and services in underserved areas, improving health outcomes and awareness.",
-      image: projectImage,
-      stats: {
-        duration: "2020 - Present",
-        beneficiaries: "25,000+ community members",
-        partners: "Ministry of Health, Local Clinics",
-        outcomes:
-          "40% reduction in preventable diseases, 150 trained health volunteers",
-      },
-    },
-  ];
+  const [projects, setProjects] = useState<Project[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  const galleryImages = [
-    projectImage,
-    projectImage,
-    projectImage,
-    projectImage,
-    projectImage,
-    projectImage,
-  ];
+  useEffect(() => {
+    const fetchProjects = async () => {
+      try {
+        const data = await db.getProjects();
+        setProjects(data);
+      } catch (error) {
+        console.error("Failed to fetch projects:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchProjects();
+  }, []);
+
+  const galleryImages = projects.map(p => p.image).filter(Boolean);
 
   const [selectedImageIndex, setSelectedImageIndex] = useState<number | null>(null);
 

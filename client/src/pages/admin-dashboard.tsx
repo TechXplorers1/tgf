@@ -1,7 +1,5 @@
-// client/src/pages/admin-dashboard.tsx
-
 import { useQuery } from "@tanstack/react-query";
-import type { Program, BlogPost } from "@shared/schema";
+import { db, Program, Project, BlogPost, Staff } from "@/lib/db";
 import AdminLayout from "@/components/AdminLayout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -9,37 +7,29 @@ import { Button } from "@/components/ui/button";
 import { ArrowRight } from "lucide-react";
 import { Link } from "wouter";
 
-type Staff = {
-  id: string;
-  name: string;
-  role: string;
-};
-
-type Project = {
-  id: string;
-  title: string;
-  status?: string | null;
-};
-
 export default function AdminDashboard() {
   const { data: programs, isLoading: isProgramsLoading, error: programsError } =
     useQuery<Program[]>({
-      queryKey: ["/api/programs"],
+      queryKey: ["local-programs"],
+      queryFn: db.getPrograms,
     });
 
   const { data: blogPosts, isLoading: isBlogLoading, error: blogError } =
     useQuery<BlogPost[]>({
-      queryKey: ["/api/blog"],
+      queryKey: ["local-blog"],
+      queryFn: db.getBlogPosts,
     });
 
   const { data: staff, isLoading: isStaffLoading, error: staffError } =
     useQuery<Staff[]>({
-      queryKey: ["/api/staff"],
+      queryKey: ["local-staff"],
+      queryFn: db.getStaff,
     });
 
   const { data: projects, isLoading: isProjectsLoading, error: projectsError } =
     useQuery<Project[]>({
-      queryKey: ["/api/projects"],
+      queryKey: ["local-projects"],
+      queryFn: db.getProjects,
     });
 
   const totalPrograms = programs?.length ?? 0;
@@ -229,11 +219,9 @@ export default function AdminDashboard() {
                 {projects.slice(0, 5).map((project) => (
                   <li key={project.id} className="text-sm">
                     <p className="font-medium">{project.title}</p>
-                    {project.status && (
-                      <p className="text-xs text-muted-foreground capitalize">
-                        {project.status}
-                      </p>
-                    )}
+                    <p className="text-xs text-muted-foreground capitalize">
+                      {project.category}
+                    </p>
                   </li>
                 ))}
               </ul>

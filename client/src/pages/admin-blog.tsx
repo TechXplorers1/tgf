@@ -1,11 +1,11 @@
-// client/src/pages/admin-blog.tsx
 
 import { useState } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { insertBlogPostSchema, type BlogPost, type InsertBlogPost } from "@shared/schema";
-import { apiRequest, queryClient } from "@/lib/queryClient";
+import { insertBlogPostSchema } from "@shared/schema";
+import { queryClient } from "@/lib/queryClient";
+import { db, BlogPost } from "@/lib/db";
 import AdminLayout from "@/components/AdminLayout";
 import {
   Table,
@@ -42,16 +42,16 @@ export default function AdminBlog() {
   const [editingPost, setEditingPost] = useState<BlogPost | null>(null);
 
   const { data: posts, isLoading } = useQuery<BlogPost[]>({
-    queryKey: ["/api/blog"],
+    queryKey: ["local-blog"],
+    queryFn: db.getBlogPosts,
   });
 
   const createMutation = useMutation({
-    mutationFn: async (data: InsertBlogPost) => {
-      const res = await apiRequest("POST", "/api/blog", data);
-      return res.json();
+    mutationFn: async (data: any) => {
+      return await db.createBlogPost(data);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/blog"] });
+      queryClient.invalidateQueries({ queryKey: ["local-blog"] });
       toast({ title: "Success", description: "Blog post created successfully" });
       setIsDialogOpen(false);
     },
@@ -65,12 +65,11 @@ export default function AdminBlog() {
   });
 
   const updateMutation = useMutation({
-    mutationFn: async ({ id, data }: { id: string; data: Partial<InsertBlogPost> }) => {
-      const res = await apiRequest("PATCH", `/api/blog/${id}`, data);
-      return res.json();
+    mutationFn: async (post: BlogPost) => {
+      return await db.updateBlogPost(post);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/blog"] });
+      queryClient.invalidateQueries({ queryKey: ["local-blog"] });
       toast({ title: "Success", description: "Blog post updated successfully" });
       setIsDialogOpen(false);
       setEditingPost(null);
@@ -85,11 +84,11 @@ export default function AdminBlog() {
   });
 
   const deleteMutation = useMutation({
-    mutationFn: async (id: string) => {
-      await apiRequest("DELETE", `/api/blog/${id}`);
+    mutationFn: async (id: string | number) => {
+      await db.deleteBlogPost(id);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/blog"] });
+      queryClient.invalidateQueries({ queryKey: ["local-blog"] });
       toast({ title: "Success", description: "Blog post deleted successfully" });
     },
     onError: (error: Error) => {
@@ -101,7 +100,9 @@ export default function AdminBlog() {
     },
   });
 
-  const form = useForm<InsertBlogPost>({
+  // We reuse the basic schema but we'll manually handle the image field
+  // or simple let the form update valid string.
+  const form = useForm<any>({
     resolver: zodResolver(insertBlogPostSchema),
     defaultValues: {
       title: "",
@@ -113,9 +114,20 @@ export default function AdminBlog() {
     },
   });
 
-  const onSubmit = (data: InsertBlogPost) => {
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        form.setValue("image", reader.result as string);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const onSubmit = (data: any) => {
     if (editingPost) {
-      updateMutation.mutate({ id: editingPost.id, data });
+      updateMutation.mutate({ ...editingPost, ...data });
     } else {
       createMutation.mutate(data);
     }
@@ -210,19 +222,36 @@ export default function AdminBlog() {
                     )}
                   />
                 </div>
+
+                {/* Image Upload Field */}
                 <FormField
                   control={form.control}
                   name="image"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Image URL</FormLabel>
+                      <FormLabel>Image</FormLabel>
                       <FormControl>
-                        <Input placeholder="https://..." {...field} />
+                        <div className="space-y-2">
+                          <Input
+                            type="file"
+                            accept="image/*"
+                            onChange={handleImageChange}
+                          />
+                          {field.value && (
+                            <img
+                              src={field.value}
+                              alt="Preview"
+                              className="w-full h-32 object-cover rounded-md mt-2"
+                            />
+                          )}
+                          {/* Hidden input to keep binding with react-hook-form if needed, or just manual logic */}
+                        </div>
                       </FormControl>
                       <FormMessage />
                     </FormItem>
                   )}
                 />
+
                 <FormField
                   control={form.control}
                   name="excerpt"

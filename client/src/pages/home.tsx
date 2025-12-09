@@ -70,7 +70,7 @@ export default function Home() {
     defaultValues: {
       name: "",
       email: "",
-      subject: "I’d like to volunteer with tgf",
+      subject: "I’d like to volunteer with TGF",
       message: "",
     },
   });
@@ -101,7 +101,7 @@ export default function Home() {
     defaultValues: {
       name: "",
       email: "",
-      subject: "I’d like to partner with tgf",
+      subject: "I’d like to partner with TGF",
       message: "",
     },
   });
@@ -143,7 +143,7 @@ export default function Home() {
       icon: Handshake,
       title: "Partner With Us",
       description:
-        "Collaborate with tgf to amplify our impact and reach more communities.",
+        "Collaborate with TGF to amplify our impact and reach more communities.",
       cta: "Become a Partner",
     },
   ];

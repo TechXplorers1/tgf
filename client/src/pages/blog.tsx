@@ -1,4 +1,6 @@
 import { useState } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { db, BlogPost } from "@/lib/db"; // Ensure these are exported from db.ts
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
@@ -11,78 +13,15 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { motion } from "framer-motion";
-import { Clock, Calendar, ArrowRight } from "lucide-react";
-import type { BlogPost } from "@shared/schema";
+import { Clock, Calendar, ArrowRight, Loader2 } from "lucide-react";
 import { format } from "date-fns";
 
-import blogImage from "@assets/project_indian_literacy.png";
-
 export default function Blog() {
-  // --- SAMPLE DATA (type-safe with BlogPost) ---
-  const blogPosts: BlogPost[] = [
-    {
-      id: "1",
-      title: "Empowering Women through Rural Education Programs",
-      category: "Education",
-      excerpt:
-        "Our rural education initiative is unlocking opportunities for young women by providing access to quality learning...",
-      content: `Access to education transforms lives, especially for women in rural areas.
-      
-Our program focuses on:
-• Adult literacy classes  
-• Digital skill training  
-• Scholarships for girls  
-
-These women are now running small businesses, joining local councils, and inspiring others to dream bigger.
-
-One participant, Amina, says:  
-“Education gave me the power to stand up for my rights and help other women.”
-
-This initiative will be extended to 3 more villages in the coming months.`,
-      readTime: 5,
-      image: blogImage,
-      publishedAt: new Date("2025-02-10T10:00:00Z"),
-    },
-    {
-      id: "2",
-      title: "Health Camps Reached 4,200 Families Last Month",
-      category: "Health",
-      excerpt:
-        "Mobile health camps are bringing critical medical services to remote communities...",
-      content: `In remote regions where hospitals are far away, our mobile health camps are a lifesaver.
-
-Last month alone:
-• 4,200 families served  
-• 800 children vaccinated  
-• 350 prenatal checkups  
-
-Volunteer doctors, nurses, and local health workers are making a tremendous difference.
-
-Our next goal: Provide basic medical insurance to 1,000 families.`,
-      readTime: 4,
-      image: blogImage,
-      publishedAt: new Date("2025-02-05T08:00:00Z"),
-    },
-    {
-      id: "3",
-      title: "Youth Leadership Program Expands Nationwide",
-      category: "Youth",
-      excerpt:
-        "The youth leadership initiative is now active in 12 districts with over 600 participants...",
-      content: `Tomorrow's leaders are being shaped today.
-
-The Youth Leadership Program trains students in:
-• Public speaking  
-• Community organizing  
-• Problem-solving  
-• Entrepreneurship  
-
-65% of participants have already launched local initiatives like clean water projects, tutoring centers, and youth clubs.`,
-      readTime: 3,
-      image: blogImage,
-      publishedAt: new Date("2025-02-01T07:30:00Z"),
-    },
-  ];
+  // Fetch from DB
+  const { data: blogPosts = [], isLoading } = useQuery<BlogPost[]>({
+    queryKey: ["local-blog"],
+    queryFn: db.getBlogPosts,
+  });
 
   const categories = [
     "All",
@@ -155,8 +94,8 @@ The Youth Leadership Program trains students in:
                     key={category}
                     variant={isActive ? "default" : "outline"}
                     className={`px-4 py-2 cursor-pointer font-sans transition-all ${isActive
-                        ? "bg-primary text-primary-foreground"
-                        : "hover:bg-primary/10"
+                      ? "bg-primary text-primary-foreground"
+                      : "hover:bg-primary/10"
                       }`}
                     onClick={() => setActiveCategory(category)}
                   >
@@ -200,7 +139,7 @@ The Youth Leadership Program trains students in:
                           <div className="flex items-center gap-1">
                             <Calendar className="h-4 w-4" />
                             <span>
-                              {format(post.publishedAt, "MMMM dd, yyyy")}
+                              {format(new Date(post.publishedAt), "MMMM dd, yyyy")}
                             </span>
                           </div>
                           <div className="flex items-center gap-1">
@@ -267,7 +206,7 @@ The Youth Leadership Program trains students in:
                   <div className="flex items-center gap-1">
                     <Calendar className="h-4 w-4" />
                     <span>
-                      {format(selectedPost.publishedAt, "MMMM dd, yyyy")}
+                      {format(new Date(selectedPost.publishedAt), "MMMM dd, yyyy")}
                     </span>
                   </div>
                   <div className="flex items-center gap-1">

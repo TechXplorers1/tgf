@@ -1,8 +1,8 @@
-// client/src/pages/admin-staff.tsx
 
 import { useState } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
-import { apiRequest, queryClient } from "@/lib/queryClient";
+import { queryClient } from "@/lib/queryClient";
+import { db, Staff } from "@/lib/db";
 import AdminLayout from "@/components/AdminLayout";
 import {
   Table,
@@ -26,39 +26,30 @@ import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { Loader2, Plus, Pencil, Trash2 } from "lucide-react";
 
-type Staff = {
-  id: string;
-  name: string;
-  role: string;
-  photoUrl?: string | null;
-  bio?: string | null;
-  isActive: boolean;
-};
-
-type StaffInput = Omit<Staff, "id">;
-
 export default function AdminStaff() {
   const { toast } = useToast();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingStaff, setEditingStaff] = useState<Staff | null>(null);
-  const [form, setForm] = useState<StaffInput>({
-    name: "",
-    role: "",
-    photoUrl: "",
-    bio: "",
-    isActive: true,
-  });
+
+  // Form state
+  const [name, setName] = useState("");
+  const [role, setRole] = useState("");
+  const [bio, setBio] = useState("");
+  const [image, setImage] = useState("");
+  const [email, setEmail] = useState("");
+  const [isActive, setIsActive] = useState(true);
 
   const { data: staff, isLoading } = useQuery<Staff[]>({
-    queryKey: ["/api/staff"],
+    queryKey: ["local-staff"],
+    queryFn: db.getStaff,
   });
 
   const createMutation = useMutation({
-    mutationFn: async (data: StaffInput) => {
-      await apiRequest("POST", "/api/staff", data);
+    mutationFn: async (data: any) => {
+      return await db.createStaff(data);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/staff"] });
+      queryClient.invalidateQueries({ queryKey: ["local-staff"] });
       toast({ title: "Success", description: "Staff member created." });
       setIsDialogOpen(false);
     },
@@ -72,11 +63,11 @@ export default function AdminStaff() {
   });
 
   const updateMutation = useMutation({
-    mutationFn: async ({ id, data }: { id: string; data: Partial<StaffInput> }) => {
-      await apiRequest("PATCH", `/api/staff/${id}`, data);
+    mutationFn: async (member: Staff) => {
+      return await db.updateStaff(member);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/staff"] });
+      queryClient.invalidateQueries({ queryKey: ["local-staff"] });
       toast({ title: "Success", description: "Staff member updated." });
       setIsDialogOpen(false);
       setEditingStaff(null);
@@ -91,11 +82,11 @@ export default function AdminStaff() {
   });
 
   const deleteMutation = useMutation({
-    mutationFn: async (id: string) => {
-      await apiRequest("DELETE", `/api/staff/${id}`);
+    mutationFn: async (id: number | string) => {
+      await db.deleteStaff(id);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/staff"] });
+      queryClient.invalidateQueries({ queryKey: ["local-staff"] });
       toast({ title: "Deleted", description: "Staff member removed." });
     },
     onError: (error: Error) => {
@@ -107,36 +98,61 @@ export default function AdminStaff() {
     },
   });
 
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setImage(reader.result as string);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const resetForm = () => {
+    setName("");
+    setRole("");
+    setBio("");
+    setImage("");
+    setEmail("");
+    setIsActive(true);
+  };
+
   const openCreate = () => {
     setEditingStaff(null);
-    setForm({
-      name: "",
-      role: "",
-      photoUrl: "",
-      bio: "",
-      isActive: true,
-    });
+    resetForm();
     setIsDialogOpen(true);
   };
 
-  const openEdit = (staffMember: Staff) => {
-    setEditingStaff(staffMember);
-    setForm({
-      name: staffMember.name,
-      role: staffMember.role,
-      photoUrl: staffMember.photoUrl ?? "",
-      bio: staffMember.bio ?? "",
-      isActive: staffMember.isActive,
-    });
+  const openEdit = (member: Staff) => {
+    setEditingStaff(member);
+    setName(member.name);
+    setRole(member.role);
+    setBio(member.bio);
+    setImage(member.image);
+    setEmail(member.email || "");
+    setIsActive(member.isActive);
     setIsDialogOpen(true);
   };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    const data = {
+      name,
+      role,
+      bio,
+      image,
+      email,
+      isActive,
+    };
+
     if (editingStaff) {
-      updateMutation.mutate({ id: editingStaff.id, data: form });
+      updateMutation.mutate({
+        ...editingStaff,
+        ...data,
+      });
     } else {
-      createMutation.mutate(form);
+      createMutation.mutate(data);
     }
   };
 
@@ -151,7 +167,7 @@ export default function AdminStaff() {
               <Plus className="mr-2 h-4 w-4" /> Add Staff
             </Button>
           </DialogTrigger>
-          <DialogContent className="sm:max-w-[480px]">
+          <DialogContent className="sm:max-w-[480px] max-h-[85vh] overflow-y-auto">
             <DialogHeader>
               <DialogTitle>
                 {editingStaff ? "Edit Staff Member" : "Add New Staff Member"}
@@ -163,8 +179,8 @@ export default function AdminStaff() {
                 <Label htmlFor="name">Name</Label>
                 <Input
                   id="name"
-                  value={form.name}
-                  onChange={(e) => setForm({ ...form, name: e.target.value })}
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
                   required
                 />
               </div>
@@ -173,30 +189,47 @@ export default function AdminStaff() {
                 <Label htmlFor="role">Role / Title</Label>
                 <Input
                   id="role"
-                  value={form.role}
-                  onChange={(e) => setForm({ ...form, role: e.target.value })}
+                  value={role}
+                  onChange={(e) => setRole(e.target.value)}
                   required
                 />
               </div>
 
               <div>
-                <Label htmlFor="photoUrl">Photo URL</Label>
+                <Label htmlFor="email">Email</Label>
                 <Input
-                  id="photoUrl"
-                  value={form.photoUrl ?? ""}
-                  onChange={(e) =>
-                    setForm({ ...form, photoUrl: e.target.value })
-                  }
-                  placeholder="https://..."
+                  id="email"
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
                 />
+              </div>
+
+              <div>
+                <Label htmlFor="image">Photo</Label>
+                <div className="space-y-2">
+                  <Input
+                    id="image"
+                    type="file"
+                    accept="image/*"
+                    onChange={handleImageChange}
+                  />
+                  {image && (
+                    <img
+                      src={image}
+                      alt="Preview"
+                      className="w-full h-32 object-cover rounded-md mt-2"
+                    />
+                  )}
+                </div>
               </div>
 
               <div>
                 <Label htmlFor="bio">Short Bio</Label>
                 <Textarea
                   id="bio"
-                  value={form.bio ?? ""}
-                  onChange={(e) => setForm({ ...form, bio: e.target.value })}
+                  value={bio}
+                  onChange={(e) => setBio(e.target.value)}
                   rows={3}
                 />
               </div>
@@ -205,10 +238,8 @@ export default function AdminStaff() {
                 <input
                   id="isActive"
                   type="checkbox"
-                  checked={form.isActive}
-                  onChange={(e) =>
-                    setForm({ ...form, isActive: e.target.checked })
-                  }
+                  checked={isActive}
+                  onChange={(e) => setIsActive(e.target.checked)}
                   className="h-4 w-4"
                 />
                 <Label htmlFor="isActive">Active</Label>

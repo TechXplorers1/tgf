@@ -55,25 +55,23 @@ export default function Header() {
               whileHover={{ rotate: -3, scale: 1.03 }}
               transition={{ type: "spring", stiffness: 200 }}
             >
-              <motion.div
-                className="w-14 h-14 rounded-md bg-primary flex items-center justify-center"
+              <motion.img
+                src="/logo.jpg"
+                alt="TGF Logo"
+                className="w-20 h-20 rounded-md shadow-sm"
                 whileHover={{ scale: 1.05 }}
-              >
-                <span className="text-primary-foreground font-heading font-bold text-3xl">
-                  T
-                </span>
-              </motion.div>
+              />
 
               <motion.div
                 initial={{ opacity: 0, x: -10 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ delay: 0.2 }}
               >
-                <h1 className="font-heading font-bold text-3xl text-foreground">
-                  tgf
+                <h1 className="font-heading font-bold text-3xl text-foreground hidden sm:block">
+                  TGF
                 </h1>
-                <p className="text-sm text-muted-foreground hidden sm:block">
-                  Empowering Communities
+                <p className="text-sm text-muted-foreground hidden lg:block">
+                  The Global Foundation
                 </p>
               </motion.div>
             </motion.div>
@@ -87,8 +85,8 @@ export default function Header() {
                   whileHover={{ scale: 1.08 }}
                   transition={{ type: "spring", stiffness: 200 }}
                   className={`relative font-sans font-medium text-lg ${location === link.href
-                      ? "text-primary"
-                      : "text-foreground/70"
+                    ? "text-primary"
+                    : "text-foreground/70"
                     } hover:text-primary`}
                 >
                   {link.label}
@@ -152,8 +150,8 @@ export default function Header() {
                   <motion.a
                     whileHover={{ x: 5 }}
                     className={`block py-2 font-medium text-lg ${location === link.href
-                        ? "text-primary"
-                        : "text-foreground"
+                      ? "text-primary"
+                      : "text-foreground"
                       }`}
                     onClick={() => setIsMobileMenuOpen(false)}
                   >

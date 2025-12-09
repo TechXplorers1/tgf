@@ -1,8 +1,8 @@
-// client/src/pages/admin-projects.tsx
 
 import { useState } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
-import { apiRequest, queryClient } from "@/lib/queryClient";
+import { queryClient } from "@/lib/queryClient";
+import { db, Project } from "@/lib/db";
 import AdminLayout from "@/components/AdminLayout";
 import {
   Table,
@@ -26,47 +26,35 @@ import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { Loader2, Plus, Pencil, Trash2 } from "lucide-react";
 
-type ProjectStatus = "ongoing" | "planned" | "completed";
-
-type Project = {
-  id: string;
-  title: string;
-  slug: string;
-  summary: string;
-  description?: string | null;
-  status: ProjectStatus;
-  startDate?: string | null;
-  endDate?: string | null;
-  heroImageUrl?: string | null;
-};
-
-type ProjectInput = Omit<Project, "id">;
-
 export default function AdminProjects() {
   const { toast } = useToast();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingProject, setEditingProject] = useState<Project | null>(null);
-  const [form, setForm] = useState<ProjectInput>({
-    title: "",
-    slug: "",
-    summary: "",
-    description: "",
-    status: "ongoing",
-    startDate: "",
-    endDate: "",
-    heroImageUrl: "",
-  });
+
+  // Form state
+  const [title, setTitle] = useState("");
+  const [category, setCategory] = useState("");
+  const [description, setDescription] = useState("");
+  const [image, setImage] = useState("");
+
+  // Stats
+  const [duration, setDuration] = useState("");
+  const [beneficiaries, setBeneficiaries] = useState("");
+  const [partners, setPartners] = useState("");
+  const [outcomes, setOutcomes] = useState("");
 
   const { data: projects, isLoading } = useQuery<Project[]>({
-    queryKey: ["/api/projects"],
+    queryKey: ["local-projects"],
+    queryFn: db.getProjects,
   });
 
   const createMutation = useMutation({
-    mutationFn: async (data: ProjectInput) => {
-      await apiRequest("POST", "/api/projects", data);
+    mutationFn: async (data: any) => {
+      // Cast to match the Omit<Project...> expected by db
+      return await db.createProject(data);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/projects"] });
+      queryClient.invalidateQueries({ queryKey: ["local-projects"] });
       toast({ title: "Success", description: "Project created." });
       setIsDialogOpen(false);
     },
@@ -80,11 +68,11 @@ export default function AdminProjects() {
   });
 
   const updateMutation = useMutation({
-    mutationFn: async ({ id, data }: { id: string; data: Partial<ProjectInput> }) => {
-      await apiRequest("PATCH", `/api/projects/${id}`, data);
+    mutationFn: async (project: Project) => {
+      return await db.updateProject(project);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/projects"] });
+      queryClient.invalidateQueries({ queryKey: ["local-projects"] });
       toast({ title: "Success", description: "Project updated." });
       setIsDialogOpen(false);
       setEditingProject(null);
@@ -99,11 +87,11 @@ export default function AdminProjects() {
   });
 
   const deleteMutation = useMutation({
-    mutationFn: async (id: string) => {
-      await apiRequest("DELETE", `/api/projects/${id}`);
+    mutationFn: async (id: number | string) => {
+      await db.deleteProject(id);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/projects"] });
+      queryClient.invalidateQueries({ queryKey: ["local-projects"] });
       toast({ title: "Deleted", description: "Project removed." });
     },
     onError: (error: Error) => {
@@ -115,42 +103,69 @@ export default function AdminProjects() {
     },
   });
 
+  const resetForm = () => {
+    setTitle("");
+    setCategory("");
+    setDescription("");
+    setImage("");
+    setDuration("");
+    setBeneficiaries("");
+    setPartners("");
+    setOutcomes("");
+  };
+
   const openCreate = () => {
     setEditingProject(null);
-    setForm({
-      title: "",
-      slug: "",
-      summary: "",
-      description: "",
-      status: "ongoing",
-      startDate: "",
-      endDate: "",
-      heroImageUrl: "",
-    });
+    resetForm();
     setIsDialogOpen(true);
   };
 
   const openEdit = (project: Project) => {
     setEditingProject(project);
-    setForm({
-      title: project.title,
-      slug: project.slug,
-      summary: project.summary,
-      description: project.description ?? "",
-      status: project.status,
-      startDate: project.startDate ?? "",
-      endDate: project.endDate ?? "",
-      heroImageUrl: project.heroImageUrl ?? "",
-    });
+    setTitle(project.title);
+    setCategory(project.category);
+    setDescription(project.description);
+    setImage(project.image);
+    setDuration(project.stats.duration);
+    setBeneficiaries(project.stats.beneficiaries);
+    setPartners(project.stats.partners);
+    setOutcomes(project.stats.outcomes);
     setIsDialogOpen(true);
+  };
+
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setImage(reader.result as string);
+      };
+      reader.readAsDataURL(file);
+    }
   };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    const data = {
+      title,
+      category,
+      description,
+      image,
+      stats: {
+        duration,
+        beneficiaries,
+        partners,
+        outcomes,
+      },
+    };
+
     if (editingProject) {
-      updateMutation.mutate({ id: editingProject.id, data: form });
+      updateMutation.mutate({
+        ...editingProject,
+        ...data,
+      });
     } else {
-      createMutation.mutate(form);
+      createMutation.mutate(data);
     }
   };
 
@@ -165,7 +180,7 @@ export default function AdminProjects() {
               <Plus className="mr-2 h-4 w-4" /> Add Project
             </Button>
           </DialogTrigger>
-          <DialogContent className="sm:max-w-[540px]">
+          <DialogContent className="sm:max-w-[600px] max-h-[85vh] overflow-y-auto">
             <DialogHeader>
               <DialogTitle>
                 {editingProject ? "Edit Project" : "Add New Project"}
@@ -173,110 +188,97 @@ export default function AdminProjects() {
             </DialogHeader>
 
             <form onSubmit={handleSubmit} className="space-y-4">
-              <div>
-                <Label htmlFor="title">Title</Label>
-                <Input
-                  id="title"
-                  value={form.title}
-                  onChange={(e) => setForm({ ...form, title: e.target.value })}
-                  required
-                />
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <Label htmlFor="title">Title</Label>
+                  <Input
+                    id="title"
+                    value={title}
+                    onChange={(e) => setTitle(e.target.value)}
+                    required
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="category">Category</Label>
+                  <Input
+                    id="category"
+                    value={category}
+                    onChange={(e) => setCategory(e.target.value)}
+                    required
+                  />
+                </div>
               </div>
 
               <div>
-                <Label htmlFor="slug">Slug (URL)</Label>
-                <Input
-                  id="slug"
-                  value={form.slug}
-                  onChange={(e) => setForm({ ...form, slug: e.target.value })}
-                  placeholder="example-project"
-                  required
-                />
-              </div>
-
-              <div>
-                <Label htmlFor="summary">Summary</Label>
-                <Input
-                  id="summary"
-                  value={form.summary}
-                  onChange={(e) =>
-                    setForm({ ...form, summary: e.target.value })
-                  }
-                  required
-                />
+                <Label htmlFor="image">Image</Label>
+                <div className="space-y-2">
+                  <Input
+                    id="image"
+                    type="file"
+                    accept="image/*"
+                    onChange={handleImageChange}
+                  />
+                  {image && (
+                    <img src={image} alt="Preview" className="w-full h-32 object-cover rounded-md mt-2" />
+                  )}
+                </div>
               </div>
 
               <div>
                 <Label htmlFor="description">Description</Label>
                 <Textarea
                   id="description"
-                  value={form.description ?? ""}
-                  onChange={(e) =>
-                    setForm({ ...form, description: e.target.value })
-                  }
+                  value={description}
+                  onChange={(e) => setDescription(e.target.value)}
                   rows={3}
                 />
               </div>
 
-              <div>
-                <Label htmlFor="status">Status</Label>
-                <select
-                  id="status"
-                  className="border rounded-md px-3 py-2 w-full bg-background"
-                  value={form.status}
-                  onChange={(e) =>
-                    setForm({
-                      ...form,
-                      status: e.target.value as ProjectStatus,
-                    })
-                  }
-                >
-                  <option value="ongoing">Ongoing</option>
-                  <option value="planned">Planned</option>
-                  <option value="completed">Completed</option>
-                </select>
-              </div>
-
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <Label htmlFor="startDate">Start Date</Label>
-                  <Input
-                    id="startDate"
-                    type="date"
-                    value={form.startDate ?? ""}
-                    onChange={(e) =>
-                      setForm({ ...form, startDate: e.target.value })
-                    }
-                  />
+              <div className="border-t pt-4 mt-4">
+                <h4 className="font-semibold mb-3">Project Stats</h4>
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <Label htmlFor="duration">Duration</Label>
+                    <Input
+                      id="duration"
+                      value={duration}
+                      onChange={(e) => setDuration(e.target.value)}
+                      placeholder="e.g. 2023 - Present"
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="beneficiaries">Beneficiaries</Label>
+                    <Input
+                      id="beneficiaries"
+                      value={beneficiaries}
+                      onChange={(e) => setBeneficiaries(e.target.value)}
+                      placeholder="e.g. 1000+"
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="partners">Partners</Label>
+                    <Input
+                      id="partners"
+                      value={partners}
+                      onChange={(e) => setPartners(e.target.value)}
+                      placeholder="e.g. UN Women"
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="outcomes">Outcomes</Label>
+                    <Input
+                      id="outcomes"
+                      value={outcomes}
+                      onChange={(e) => setOutcomes(e.target.value)}
+                      placeholder="e.g. Reduced poverty"
+                    />
+                  </div>
                 </div>
-                <div>
-                  <Label htmlFor="endDate">End Date</Label>
-                  <Input
-                    id="endDate"
-                    type="date"
-                    value={form.endDate ?? ""}
-                    onChange={(e) =>
-                      setForm({ ...form, endDate: e.target.value })
-                    }
-                  />
-                </div>
-              </div>
-
-              <div>
-                <Label htmlFor="heroImageUrl">Hero Image URL</Label>
-                <Input
-                  id="heroImageUrl"
-                  value={form.heroImageUrl ?? ""}
-                  onChange={(e) =>
-                    setForm({ ...form, heroImageUrl: e.target.value })
-                  }
-                  placeholder="https://..."
-                />
               </div>
 
               <Button
                 type="submit"
-                className="w-full"
+                className="w-full mt-6"
                 disabled={createMutation.isPending || updateMutation.isPending}
               >
                 {(createMutation.isPending || updateMutation.isPending) && (
@@ -294,8 +296,8 @@ export default function AdminProjects() {
           <TableHeader>
             <TableRow>
               <TableHead>Title</TableHead>
-              <TableHead>Status</TableHead>
-              <TableHead>Slug</TableHead>
+              <TableHead>Category</TableHead>
+              <TableHead>Duration</TableHead>
               <TableHead className="w-[120px]">Actions</TableHead>
             </TableRow>
           </TableHeader>
@@ -322,9 +324,9 @@ export default function AdminProjects() {
                     {project.title}
                   </TableCell>
                   <TableCell className="capitalize">
-                    {project.status}
+                    {project.category}
                   </TableCell>
-                  <TableCell>{project.slug}</TableCell>
+                  <TableCell>{project.stats?.duration}</TableCell>
                   <TableCell>
                     <div className="flex items-center gap-2">
                       <Button

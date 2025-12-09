@@ -1,4 +1,3 @@
-// client/src/pages/admin-login.tsx
 
 import { FormEvent, useState } from "react";
 import { useLocation } from "wouter";
@@ -14,7 +13,7 @@ const AdminLogin = () => {
   const { login } = useAuth();
   const [, navigate] = useLocation();
 
-  // Prefill with demo credentials (you can change/clear these)
+  // Prefill with demo credentials
   const [email, setEmail] = useState("test@mail.in");
   const [password, setPassword] = useState("1234567890");
   const [showPassword, setShowPassword] = useState(false);
@@ -60,19 +59,17 @@ const AdminLogin = () => {
               <div className="relative rounded-[1.45rem] bg-[#3A251D]/95 backdrop-blur-xl px-10 py-10 flex flex-col justify-between min-h-[360px] text-[#F5E9D5]">
                 <div className="space-y-6">
                   <div className="flex items-center gap-4">
-                    <div className="h-16 w-16 rounded-2xl bg-[#5A3A2C]/90 flex items-center justify-center shadow-lg shadow-black/40">
-                      <img
-                        src="/favicon.png"
-                        alt="tgf Logo"
-                        className="h-12 w-12 object-contain"
-                      />
-                    </div>
+                    <img
+                      src="/logo.jpg"
+                      alt="TGF Logo"
+                      className="h-24 w-24 rounded-2xl shadow-lg shadow-black/40"
+                    />
                     <div>
                       <p className="text-[11px] uppercase tracking-[0.24em] text-[#D0B9A6]/90">
-                        tgf • NGO Platform
+                        TGF • NGO Platform
                       </p>
                       <h1 className="text-3xl lg:text-4xl font-semibold">
-                        tgf Admin
+                        TGF Admin
                       </h1>
                     </div>
                   </div>
@@ -115,12 +112,12 @@ const AdminLogin = () => {
                 {/* Header */}
                 <div className="mb-6 text-center">
                   <p className="text-[11px] uppercase tracking-[0.22em] text-[#8B6E56]">
-                    tgf • Admin Console
+                    TGF • Admin Console
                   </p>
                   <h2 className="text-2xl font-semibold mt-2">Admin Login</h2>
                   <p className="text-xs text-gray-500 mt-1">
                     Use your authorized administrator credentials to access the
-                    tgf dashboard.
+                    TGF dashboard.
                   </p>
                 </div>
 
@@ -212,7 +209,7 @@ const AdminLogin = () => {
               </div>
 
               <p className="mt-5 text-[10px] text-center text-[#D0B9A6]/80">
-                © {new Date().getFullYear()} tgf. Secure internal admin
+                © {new Date().getFullYear()} TGF. Secure internal admin
                 environment.
               </p>
             </div>
