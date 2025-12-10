@@ -40,11 +40,11 @@ const AdminLogin = () => {
   };
 
   return (
-    <div className="relative min-h-screen bg-[#2B1B15] overflow-hidden text-[#F5E9D5]">
-      {/* Background dark brown gradient + soft glows */}
-      <div className="pointer-events-none absolute inset-0 bg-gradient-to-br from-[#4A2F23]/90 via-[#3A251D] to-[#2B1B15]" />
-      <div className="pointer-events-none absolute -top-24 -left-24 w-72 h-72 rounded-full bg-[#8B6E56]/25 blur-3xl" />
-      <div className="pointer-events-none absolute -bottom-24 right-0 w-80 h-80 rounded-full bg-[#7A4E3B]/30 blur-3xl" />
+    <div className="relative min-h-screen bg-[#0f172a] overflow-hidden text-slate-50">
+      {/* Background dark slate gradient + soft glows */}
+      <div className="pointer-events-none absolute inset-0 bg-gradient-to-br from-[#1e293b]/90 via-[#0f172a] to-[#020617]" />
+      <div className="pointer-events-none absolute -top-24 -left-24 w-72 h-72 rounded-full bg-blue-600/20 blur-3xl" />
+      <div className="pointer-events-none absolute -bottom-24 right-0 w-80 h-80 rounded-full bg-sky-600/20 blur-3xl" />
 
       <div className="relative z-10 flex min-h-screen items-center justify-center px-4 py-6 md:px-10 lg:px-16">
         <div className="w-full max-w-6xl grid gap-10 lg:gap-14 lg:grid-cols-[minmax(0,1.1fr)_minmax(0,0.9fr)] items-center">
@@ -55,17 +55,17 @@ const AdminLogin = () => {
             transition={{ duration: 0.6, ease: "easeOut" }}
             className="hidden md:block"
           >
-            <div className="relative rounded-3xl bg-gradient-to-br from-[#4A2F23] via-[#7A4E3B] to-[#B08A6E] p-[1px] shadow-[0_40px_120px_rgba(0,0,0,0.65)]">
-              <div className="relative rounded-[1.45rem] bg-[#3A251D]/95 backdrop-blur-xl px-10 py-10 flex flex-col justify-between min-h-[360px] text-[#F5E9D5]">
+            <div className="relative rounded-3xl bg-gradient-to-br from-[#1e293b] via-[#3b82f6] to-[#0ea5e9] p-[1px] shadow-[0_40px_120px_rgba(0,0,0,0.65)]">
+              <div className="relative rounded-[1.45rem] bg-[#0f172a]/95 backdrop-blur-xl px-10 py-10 flex flex-col justify-between min-h-[360px] text-slate-50">
                 <div className="space-y-6">
                   <div className="flex items-center gap-4">
                     <img
-                      src="/logo.jpg"
+                      src="/logo.png"
                       alt="TGF Logo"
                       className="h-24 w-24 rounded-2xl shadow-lg shadow-black/40"
                     />
                     <div>
-                      <p className="text-[11px] uppercase tracking-[0.24em] text-[#D0B9A6]/90">
+                      <p className="text-[11px] uppercase tracking-[0.24em] text-blue-200/90">
                         TGF • NGO Platform
                       </p>
                       <h1 className="text-3xl lg:text-4xl font-semibold">
@@ -74,25 +74,25 @@ const AdminLogin = () => {
                     </div>
                   </div>
 
-                  <p className="max-w-md text-sm leading-relaxed text-[#EEDAC6]/90">
+                  <p className="max-w-md text-sm leading-relaxed text-slate-300/90">
                     Centralized, secure workspace for program teams and
                     leadership to manage initiatives, respond to communities,
                     and publish impact stories with confidence.
                   </p>
 
-                  <ul className="text-sm space-y-2 text-[#D7C0AE]">
+                  <ul className="text-sm space-y-2 text-slate-300">
                     <li>• Real-time community program oversight</li>
                     <li>• Streamlined outreach & volunteer coordination</li>
                     <li>• Editorial-grade impact storytelling tools</li>
                   </ul>
                 </div>
 
-                <div className="mt-6 flex items-center justify-between text-[11px] text-[#D0B9A6]/80">
+                <div className="mt-6 flex items-center justify-between text-[11px] text-slate-400">
                   <span className="inline-flex items-center gap-2">
-                    <span className="h-1.5 w-1.5 rounded-full bg-emerald-300 animate-pulse" />
+                    <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse" />
                     Secure internal environment
                   </span>
-                  <span className="rounded-full bg-[#2B1B15]/80 px-3 py-1 border border-[#8B6E56]/40">
+                  <span className="rounded-full bg-[#020617]/80 px-3 py-1 border border-blue-500/30">
                     Admin access only
                   </span>
                 </div>
@@ -108,10 +108,10 @@ const AdminLogin = () => {
             className="w-full"
           >
             <div className="mx-auto w-full max-w-md">
-              <div className="rounded-3xl bg-white shadow-[0_30px_80px_rgba(0,0,0,0.6)] ring-1 ring-[#D0B9A6] px-8 py-9 text-[#4A2F23]">
+              <div className="rounded-3xl bg-white shadow-[0_30px_80px_rgba(0,0,0,0.6)] ring-1 ring-slate-200 px-8 py-9 text-slate-900">
                 {/* Header */}
                 <div className="mb-6 text-center">
-                  <p className="text-[11px] uppercase tracking-[0.22em] text-[#8B6E56]">
+                  <p className="text-[11px] uppercase tracking-[0.22em] text-blue-600">
                     TGF • Admin Console
                   </p>
                   <h2 className="text-2xl font-semibold mt-2">Admin Login</h2>
@@ -175,7 +175,7 @@ const AdminLogin = () => {
                   <Button
                     type="submit"
                     disabled={loading}
-                    className="mt-2 w-full h-11 rounded-2xl bg-[#4A2F23] hover:bg-[#3A251D] text-white text-[13px] font-medium tracking-wide flex items-center justify-center gap-2"
+                    className="mt-2 w-full h-11 rounded-2xl bg-[#0f172a] hover:bg-[#1e293b] text-white text-[13px] font-medium tracking-wide flex items-center justify-center gap-2"
                   >
                     {loading ? (
                       "Authorising…"
@@ -189,26 +189,26 @@ const AdminLogin = () => {
                 </form>
 
                 {/* Demo credentials */}
-                <div className="mt-6 border-t border-dashed border-[#E3D1C0] pt-4 text-center text-[11px] text-gray-600">
-                  <p className="mb-1 font-semibold text-[#4A2F23]">
+                <div className="mt-6 border-t border-dashed border-slate-200 pt-4 text-center text-[11px] text-gray-600">
+                  <p className="mb-1 font-semibold text-slate-900">
                     Demo admin credentials
                   </p>
                   <p>
                     Email:{" "}
-                    <span className="font-medium text-[#4A2F23]">
+                    <span className="font-medium text-slate-900">
                       test@mail.in
                     </span>
                   </p>
                   <p>
                     Password:{" "}
-                    <span className="font-medium text-[#4A2F23]">
+                    <span className="font-medium text-slate-900">
                       1234567890
                     </span>
                   </p>
                 </div>
               </div>
 
-              <p className="mt-5 text-[10px] text-center text-[#D0B9A6]/80">
+              <p className="mt-5 text-[10px] text-center text-slate-400">
                 © {new Date().getFullYear()} TGF. Secure internal admin
                 environment.
               </p>

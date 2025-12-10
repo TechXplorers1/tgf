@@ -165,7 +165,7 @@ export default function Footer() {
           >
             <div className="flex items-center space-x-2 mb-4">
               <img
-                src="/logo.jpg"
+                src="/logo.png"
                 alt="TGF Logo"
                 className="w-16 h-16 rounded-md shadow-sm"
               />

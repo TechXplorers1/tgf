@@ -41,10 +41,10 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
   return (
     <div className="min-h-screen flex bg-muted/10">
       {/* Sidebar */}
-      <aside className="hidden md:flex md:w-64 flex-col border-r bg-background">
-        <div className="px-6 py-4 border-b">
+      <aside className="hidden md:flex md:w-64 flex-col border-r bg-[#0f172a] text-slate-100">
+        <div className="px-6 py-4 border-b border-slate-800">
           <h1 className="font-heading font-bold text-xl">TGF Admin</h1>
-          <p className="text-xs text-muted-foreground">Internal dashboard</p>
+          <p className="text-xs text-slate-400">Internal dashboard</p>
         </div>
 
         <nav className="flex-1 px-2 py-4 space-y-1">
@@ -56,8 +56,8 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
                 <button
                   className={`w-full flex items-center gap-2 px-3 py-2 rounded-md text-sm font-sans text-left transition 
                     ${isActive
-                      ? "bg-primary text-primary-foreground"
-                      : "text-foreground/80 hover:bg-muted"
+                      ? "bg-blue-600 text-white"
+                      : "text-slate-400 hover:bg-slate-800 hover:text-white"
                     }`}
                 >
                   <Icon className="h-4 w-4" />
@@ -68,11 +68,11 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
           })}
         </nav>
 
-        <div className="p-4 border-t">
+        <div className="p-4 border-t border-slate-800">
           <Button
-            variant="outline"
+            variant="ghost"
             size="sm"
-            className="w-full justify-center"
+            className="w-full justify-center text-slate-400 hover:bg-slate-800 hover:text-white"
             onClick={handleLogout}
           >
             <LogOut className="h-4 w-4 mr-2" />
@@ -84,7 +84,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
       {/* Main content */}
       <div className="flex-1 flex flex-col">
         {/* Top bar */}
-        <header className="h-14 border-b flex items-center justify-between px-4 md:px-6 bg-background">
+        <header className="h-14 border-b flex items-center justify-between px-4 md:px-6 bg-white">
           <h2 className="font-heading font-semibold text-lg">Admin Dashboard</h2>
           <Link href="/">
             <Button variant="outline" size="sm" className="hidden sm:inline-flex">

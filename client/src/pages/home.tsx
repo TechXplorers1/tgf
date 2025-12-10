@@ -192,30 +192,41 @@ export default function Home() {
               {ctaCards.map((card, i) => {
                 const Icon = card.icon;
                 return (
-                  <Card
+                  <motion.div
                     key={i}
-                    className="p-6 text-center flex flex-col hover:shadow-lg"
+                    initial={{ opacity: 0, y: 30 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true, amount: 0.2 }}
+                    transition={{
+                      duration: 0.5,
+                      delay: i * 0.15,
+                      ease: [0.22, 1, 0.36, 1],
+                    }}
                   >
-                    <Icon className="h-10 w-10 mx-auto mb-4" />
-                    <h3 className="text-xl font-semibold mb-2">
-                      {card.title}
-                    </h3>
-                    <p className="text-muted-foreground flex-1">
-                      {card.description}
-                    </p>
-                    <Button
-                      className="mt-6 w-full"
-                      onClick={() =>
-                        card.title === "Support Our Cause"
-                          ? setIsDonationDialogOpen(true)
-                          : card.title === "Volunteer With Us"
-                            ? setIsVolunteerDialogOpen(true)
-                            : setIsPartnerDialogOpen(true)
-                      }
+                    <Card
+                      className="p-6 text-center flex flex-col hover:shadow-xl hover:-translate-y-1 transition-all duration-300 h-full border-t-4 border-t-transparent hover:border-t-primary"
                     >
-                      {card.cta}
-                    </Button>
-                  </Card>
+                      <Icon className="h-12 w-12 mx-auto mb-4 text-primary bg-primary/10 p-2.5 rounded-full" />
+                      <h3 className="text-xl font-heading font-bold mb-2">
+                        {card.title}
+                      </h3>
+                      <p className="text-muted-foreground flex-1 font-sans">
+                        {card.description}
+                      </p>
+                      <Button
+                        className="mt-6 w-full font-medium"
+                        onClick={() =>
+                          card.title === "Support Our Cause"
+                            ? setIsDonationDialogOpen(true)
+                            : card.title === "Volunteer With Us"
+                              ? setIsVolunteerDialogOpen(true)
+                              : setIsPartnerDialogOpen(true)
+                        }
+                      >
+                        {card.cta}
+                      </Button>
+                    </Card>
+                  </motion.div>
                 );
               })}
             </div>

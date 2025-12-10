@@ -56,7 +56,7 @@ export default function Header() {
               transition={{ type: "spring", stiffness: 200 }}
             >
               <motion.img
-                src="/logo.jpg"
+                src="/logo.png"
                 alt="TGF Logo"
                 className="w-20 h-20 rounded-md shadow-sm"
                 whileHover={{ scale: 1.05 }}
