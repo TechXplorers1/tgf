@@ -1,5 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { db, Program, Project, BlogPost, Staff } from "@/lib/db";
+import { ContactMessage, Donation } from "@shared/schema";
 import AdminLayout from "@/components/AdminLayout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -32,19 +33,44 @@ export default function AdminDashboard() {
       queryFn: db.getProjects,
     });
 
+  const { data: messages, isLoading: isMessagesLoading } = useQuery<ContactMessage[]>({
+    queryKey: ["/api/contact-messages"],
+  });
+
+  const { data: donations, isLoading: isDonationsLoading } = useQuery<Donation[]>({
+    queryKey: ["/api/donations"],
+  });
+
   const totalPrograms = programs?.length ?? 0;
   const totalBlogPosts = blogPosts?.length ?? 0;
   const totalStaff = staff?.length ?? 0;
   const totalProjects = projects?.length ?? 0;
+  const totalMessages = messages?.length ?? 0;
+  const totalDonations = donations?.reduce((acc, curr) => acc + curr.amount, 0) ?? 0;
 
   return (
     <AdminLayout>
       {/* Top stats cards */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+        <StatCard
+          label="Total Donations"
+          value={isDonationsLoading ? undefined : `₹${totalDonations.toLocaleString()}`}
+          description={`${donations?.length ?? 0} contributions`}
+        />
+        <StatCard
+          label="Messages"
+          value={isMessagesLoading ? undefined : totalMessages.toString()}
+          description="Contact form submissions"
+        />
         <StatCard
           label="Programs"
           value={isProgramsLoading ? undefined : totalPrograms.toString()}
           description="Active community programs"
+        />
+        <StatCard
+          label="Projects"
+          value={isProjectsLoading ? undefined : totalProjects.toString()}
+          description="Ongoing & completed projects"
         />
         <StatCard
           label="Blog Posts"
@@ -55,11 +81,6 @@ export default function AdminDashboard() {
           label="Team Members"
           value={isStaffLoading ? undefined : totalStaff.toString()}
           description="Active staff members"
-        />
-        <StatCard
-          label="Projects"
-          value={isProjectsLoading ? undefined : totalProjects.toString()}
-          description="Ongoing & completed projects"
         />
       </div>
 

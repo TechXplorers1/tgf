@@ -76,7 +76,7 @@ export function DonateSection({ initialProgram }: DonateSectionProps) {
           ? data.amount
           : selectedAmount || parseInt(customAmount) || 0;
 
-      return await apiRequest("POST", "/api/donation", {
+      return await apiRequest("POST", "/api/donations", {
         ...data,
         amount: finalAmount,
       });

@@ -19,11 +19,13 @@ type AdminLayoutProps = {
 
 const navItems = [
   { href: "/admin", label: "Dashboard", icon: LayoutDashboard },
+  { href: "/admin/messages", label: "Messages", icon: BookOpen }, // Added
+  { href: "/admin/payments", label: "Payments", icon: Layers },   // Added
   { href: "/admin/programs", label: "Programs", icon: BookOpen },
   { href: "/admin/blog", label: "Blog Posts", icon: BookOpen },
-  { href: "/admin/staff", label: "Staff", icon: Users },       // 👈 Added
+  { href: "/admin/staff", label: "Staff", icon: Users },
   { href: "/admin/projects", label: "Projects", icon: Layers },
-  { href: "/admin/settings", label: "Settings", icon: BookOpen }, // 👈 Added
+  { href: "/admin/settings", label: "Settings", icon: BookOpen },
 ];
 
 export default function AdminLayout({ children }: AdminLayoutProps) {

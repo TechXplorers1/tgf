@@ -7,6 +7,7 @@ import {
   insertProgramSchema,
   insertBlogPostSchema,
   insertSiteConfigSchema,
+  insertDonationSchema,
 } from "@shared/schema";
 import { fromError } from "zod-validation-error";
 
@@ -22,6 +23,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: validationError.message });
       }
       res.status(400).json({ message: error.message || "Failed to subscribe" });
+    }
+  });
+
+  app.get("/api/newsletter", async (_req, res) => {
+    try {
+      const subs = await storage.getAllNewsletterSubscriptions();
+      res.json(subs);
+    } catch (error: any) {
+      res.status(500).json({ message: error.message || "Failed to fetch subscriptions" });
     }
   });
 
@@ -72,6 +82,30 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json(stories);
     } catch (error: any) {
       res.status(500).json({ message: error.message || "Failed to fetch stories" });
+    }
+  });
+
+  // Donations
+  app.post("/api/donations", async (req, res) => {
+    try {
+      const validatedData = insertDonationSchema.parse(req.body);
+      const donation = await storage.createDonation(validatedData);
+      res.json(donation);
+    } catch (error: any) {
+      if (error.name === "ZodError") {
+        const validationError = fromError(error);
+        return res.status(400).json({ message: validationError.message });
+      }
+      res.status(500).json({ message: error.message || "Failed to process donation" });
+    }
+  });
+
+  app.get("/api/donations", async (_req, res) => {
+    try {
+      const donations = await storage.getAllDonations();
+      res.json(donations);
+    } catch (error: any) {
+      res.status(500).json({ message: error.message || "Failed to fetch donations" });
     }
   });
 

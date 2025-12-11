@@ -10,12 +10,15 @@ import {
   type InsertBlogPost,
   type SiteConfig,
   type InsertSiteConfig,
+  type Donation,
+  type InsertDonation,
 } from "@shared/schema";
 import { randomUUID } from "crypto";
 
 export interface IStorage {
   createNewsletterSubscription(subscription: InsertNewsletterSubscription): Promise<NewsletterSubscription>;
   getNewsletterSubscriptionByEmail(email: string): Promise<NewsletterSubscription | undefined>;
+  getAllNewsletterSubscriptions(): Promise<NewsletterSubscription[]>;
   createContactMessage(message: InsertContactMessage): Promise<ContactMessage>;
   getAllContactMessages(): Promise<ContactMessage[]>;
   deleteContactMessage(id: string): Promise<void>;
@@ -30,6 +33,8 @@ export interface IStorage {
   getAllStories(): Promise<Story[]>;
   getSiteConfig(): Promise<SiteConfig>;
   updateSiteConfig(config: Partial<InsertSiteConfig>): Promise<SiteConfig>;
+  createDonation(donation: InsertDonation): Promise<Donation>;
+  getAllDonations(): Promise<Donation[]>;
 }
 
 export class MemStorage implements IStorage {
@@ -38,6 +43,7 @@ export class MemStorage implements IStorage {
   private blogPosts: Map<string, BlogPost>;
   private programs: Map<string, Program>;
   private stories: Map<string, Story>;
+  private donations: Map<string, Donation>;
   private siteConfig: SiteConfig;
 
   constructor() {
@@ -46,6 +52,7 @@ export class MemStorage implements IStorage {
     this.blogPosts = new Map();
     this.programs = new Map();
     this.stories = new Map();
+    this.donations = new Map();
     this.siteConfig = {
       id: 1,
       email: "inquiries@techxplorers.in",
@@ -201,6 +208,12 @@ export class MemStorage implements IStorage {
     );
   }
 
+  async getAllNewsletterSubscriptions(): Promise<NewsletterSubscription[]> {
+    return Array.from(this.newsletterSubscriptions.values()).sort(
+      (a, b) => (b.subscribedAt?.getTime() || 0) - (a.subscribedAt?.getTime() || 0)
+    );
+  }
+
   async createContactMessage(
     insertMessage: InsertContactMessage
   ): Promise<ContactMessage> {
@@ -281,6 +294,24 @@ export class MemStorage implements IStorage {
 
   async getAllStories(): Promise<Story[]> {
     return Array.from(this.stories.values());
+  }
+
+  async createDonation(insertDonation: InsertDonation): Promise<Donation> {
+    const id = randomUUID();
+    const donation: Donation = {
+      ...insertDonation,
+      id,
+      createdAt: new Date(),
+      donorName: insertDonation.donorName ?? null, // Ensure explicit null if undefined
+    };
+    this.donations.set(id, donation);
+    return donation;
+  }
+
+  async getAllDonations(): Promise<Donation[]> {
+    return Array.from(this.donations.values()).sort(
+      (a, b) => (b.createdAt?.getTime() || 0) - (a.createdAt?.getTime() || 0)
+    );
   }
 }
 
