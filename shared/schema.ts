@@ -27,6 +27,19 @@ export const siteConfig = pgTable("site_config", {
   contactHeroSubtitle: text("contact_hero_subtitle").notNull().default("Have questions or want to get involved? We'd love to hear from you."),
   contactFormTitle: text("contact_form_title").notNull().default("Send us a message"),
   contactFormSubtitle: text("contact_form_subtitle").notNull().default("Fill out the form below and we'll get back to you within 24 hours."),
+  // About Page
+  aboutHeroTitle: text("about_hero_title").notNull().default("About TGF"),
+  aboutHeroSubtitle: text("about_hero_subtitle").notNull().default("Community Advocacy for Gender and Development"),
+  missionTitle: text("mission_title").notNull().default("Our Mission"),
+  missionDescription: text("mission_description").notNull().default("To empower African communities through sustainable development programs that promote gender equality, youth development, and economic empowerment. We work alongside local communities to create lasting change that transforms lives and builds resilient societies."),
+  visionTitle: text("vision_title").notNull().default("Our Vision"),
+  visionDescription: text("vision_description").notNull().default("A future where every community in Africa has equal access to opportunities, resources, and the power to shape their own development. We envision thriving communities where gender equality is the norm, youth are empowered to lead, and sustainable development is a reality."),
+  approachTitle: text("approach_title").notNull().default("Our Approach"),
+  approachDescription: text("approach_description").notNull().default("We believe in community-led development. Our approach centers on listening to the voices of those we serve, partnering with local leaders, and implementing programs that address the root causes of inequality and poverty. Through capacity building, advocacy, and direct service delivery, we create sustainable impact that extends beyond our immediate interventions."),
+  valuesTitle: text("values_title").notNull().default("Our Values"),
+  valuesDescription: text("values_description").notNull().default("The principles that guide our work and define who we are as an organization."),
+  teamTitle: text("team_title").notNull().default("Meet Our Team"),
+  teamDescription: text("team_description").notNull().default("Dedicated professionals committed to creating sustainable change in communities across Africa."),
 });
 
 export const stories = pgTable("stories", {
@@ -115,6 +128,14 @@ export const projects = pgTable("projects", {
   outcomes: text("outcomes").notNull(),
 });
 
+export const values = pgTable("values", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  title: text("title").notNull(),
+  description: text("description").notNull(),
+  icon: text("icon").notNull(),
+  order: integer("order").notNull().default(0),
+});
+
 /* -------------------- DONATIONS -------------------- */
 
 export const donations = pgTable("donations", {
@@ -160,6 +181,7 @@ export const insertHeroSlideSchema = createInsertSchema(heroSlides).omit({ id: t
 export const insertImpactStatSchema = createInsertSchema(impactStats).omit({ id: true });
 export const insertPartnerSchema = createInsertSchema(partners).omit({ id: true });
 export const insertProjectSchema = createInsertSchema(projects).omit({ id: true });
+export const insertValueSchema = createInsertSchema(values).omit({ id: true });
 export const insertSiteConfigSchema = createInsertSchema(siteConfig);
 
 /* -------------------- TYPES -------------------- */
@@ -196,6 +218,9 @@ export type InsertPartner = z.infer<typeof insertPartnerSchema>;
 
 export type Project = typeof projects.$inferSelect;
 export type InsertProject = z.infer<typeof insertProjectSchema>;
+
+export type Value = typeof values.$inferSelect;
+export type InsertValue = z.infer<typeof insertValueSchema>;
 
 export type SiteConfig = typeof siteConfig.$inferSelect;
 export type InsertSiteConfig = z.infer<typeof insertSiteConfigSchema>;

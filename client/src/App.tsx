@@ -27,7 +27,7 @@ import AdminDashboard from "@/pages/admin-dashboard";
 import AdminPrograms from "@/pages/admin-programs";
 import AdminBlog from "@/pages/admin-blog";
 import AdminLogin from "@/pages/admin-login";
-import AdminStaff from "@/pages/admin-staff";
+import AdminAbout from "@/pages/admin-about";
 import AdminProjects from "@/pages/admin-projects";
 import AdminSettings from "@/pages/admin-settings";
 import AdminContacts from "@/pages/admin-contacts";
@@ -114,10 +114,10 @@ function Router() {
           )}
         </Route>
 
-        <Route path="/admin/staff">
+        <Route path="/admin/about">
           {() => (
             <RequireAuth>
-              <AdminStaff />
+              <AdminAbout />
             </RequireAuth>
           )}
         </Route>

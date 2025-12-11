@@ -1,5 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
-import { db, Staff } from "@/lib/db";
+import { db } from "@/lib/db"; // unused
+import { SiteConfig, Value, Staff } from "@shared/schema";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { Card } from "@/components/ui/card";
@@ -16,10 +17,24 @@ import {
 import { Button } from "@/components/ui/button";
 
 export default function About() {
-  const { data: team = [] } = useQuery<Staff[]>({
-    queryKey: ["local-staff"],
-    queryFn: db.getStaff,
+  const { data: config } = useQuery<SiteConfig>({
+    queryKey: ["/api/site-config"],
   });
+
+  /* const { data: values = [] } = useQuery<Value[]>({
+    queryKey: ["/api/values"],
+  }); */
+
+  const { data: team = [] } = useQuery<Staff[]>({
+    queryKey: ["/api/staff"],
+  });
+
+  /* const IconMap: Record<string, any> = {
+    Target,
+    Eye,
+    Heart,
+    Users,
+  }; */
 
   const values = [
     {

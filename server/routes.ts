@@ -8,6 +8,8 @@ import {
   insertBlogPostSchema,
   insertSiteConfigSchema,
   insertDonationSchema,
+  insertValueSchema,
+  insertStaffSchema,
 } from "@shared/schema";
 import { fromError } from "zod-validation-error";
 
@@ -216,6 +218,100 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: validationError.message });
       }
       res.status(500).json({ message: error.message || "Failed to update site config" });
+    }
+  });
+
+  // Values CRUD
+  app.get("/api/values", async (_req, res) => {
+    try {
+      const values = await storage.getAllValues();
+      res.json(values);
+    } catch (error: any) {
+      res.status(500).json({ message: error.message || "Failed to fetch values" });
+    }
+  });
+
+  app.post("/api/values", async (req, res) => {
+    try {
+      const validatedData = insertValueSchema.parse(req.body);
+      const value = await storage.createValue(validatedData);
+      res.json(value);
+    } catch (error: any) {
+      if (error.name === "ZodError") {
+        const validationError = fromError(error);
+        return res.status(400).json({ message: validationError.message });
+      }
+      res.status(500).json({ message: error.message || "Failed to create value" });
+    }
+  });
+
+  app.patch("/api/values/:id", async (req, res) => {
+    try {
+      const validatedData = insertValueSchema.partial().parse(req.body);
+      const value = await storage.updateValue(req.params.id, validatedData);
+      res.json(value);
+    } catch (error: any) {
+      if (error.name === "ZodError") {
+        const validationError = fromError(error);
+        return res.status(400).json({ message: validationError.message });
+      }
+      res.status(500).json({ message: error.message || "Failed to update value" });
+    }
+  });
+
+  app.delete("/api/values/:id", async (req, res) => {
+    try {
+      await storage.deleteValue(req.params.id);
+      res.status(204).send();
+    } catch (error: any) {
+      res.status(500).json({ message: error.message || "Failed to delete value" });
+    }
+  });
+
+  // Staff CRUD
+  app.get("/api/staff", async (_req, res) => {
+    try {
+      const staff = await storage.getAllStaff();
+      res.json(staff);
+    } catch (error: any) {
+      res.status(500).json({ message: error.message || "Failed to fetch staff" });
+    }
+  });
+
+  app.post("/api/staff", async (req, res) => {
+    try {
+      const validatedData = insertStaffSchema.parse(req.body);
+      const staff = await storage.createStaff(validatedData);
+      res.json(staff);
+    } catch (error: any) {
+      if (error.name === "ZodError") {
+        const validationError = fromError(error);
+        return res.status(400).json({ message: validationError.message });
+      }
+      res.status(500).json({ message: error.message || "Failed to create staff member" });
+    }
+  });
+
+  app.patch("/api/staff/:id", async (req, res) => {
+    try {
+      const validatedData = insertStaffSchema.partial().parse(req.body);
+      const staff = await storage.updateStaff(req.params.id, validatedData);
+      res.json(staff);
+    } catch (error: any) {
+      if (error.name === "ZodError") {
+        const validationError = fromError(error);
+        return res.status(400).json({ message: validationError.message });
+      }
+      res.status(500).json({ message: error.message || "Failed to update staff member" });
+    }
+  });
+
+  app.delete("/api/staff/:id", async (req, res) => {
+    try {
+      await storage.deleteStaff(req.params.id);
+      res.status(204).send();
+    } catch (error: any) {
+      res.status(500).json({ message: error.message || "Failed to delete staff member" });
     }
   });
 
